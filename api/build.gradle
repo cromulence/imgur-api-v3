@@ -1,0 +1,7 @@
+dependencies {
+    compileOnly libs.slf4j
+
+    compile libs.gson
+    compile libs.guava
+    compile libs.httpclient
+}

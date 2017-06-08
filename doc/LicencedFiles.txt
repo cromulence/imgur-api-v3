@@ -1,0 +1,17 @@
+Test Resources
+
+1.png
+https://en.wikipedia.org/wiki/File:Elongated_circle_1.svg (600px*600px png retrieved 2017-06-08)
+By Wikipedia user Northenglish, Public Domain
+
+2.png
+https://commons.wikimedia.org/wiki/File:NYCS-bull-trans-2.svg (600px*600px png retrieved 2017-06-08)
+By Wikipedia user Flamurai, Public Domain
+
+2.png
+https://en.m.wikipedia.org/wiki/File:Junction_3.svg (640px*457px png retrieved 2017-06-08)
+By Wikipedia user Mauls, Public Domain
+
+testcard.png
+https://en.wikipedia.org/wiki/File:PM5544_with_non-PAL_signals.png (retrieved 2017-06-08)
+By Wikipedia user Zacabeb, Public Domain

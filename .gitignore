@@ -1,0 +1,11 @@
+.classpath
+.settings
+.project
+.gradle
+.metadata
+bin
+build
+.idea/
+/.nb-gradle/
+.nb-gradle-properties
+target

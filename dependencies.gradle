@@ -1,0 +1,20 @@
+ext.datawrapperVersion = "0.9"
+
+ext.libs = [
+        datawrapperApi:        "net.cromulence.datawrapper:datawrapper-api:${ext.datawrapperVersion}",
+        datawrapperProperties: "net.cromulence.datawrapper:properties:${ext.datawrapperVersion}",
+        guava:                 "com.google.guava:guava:17.0",
+        gson:                  "com.google.code.gson:gson:2.2.4",
+        httpclient:            "org.apache.httpcomponents:httpclient:4.5.2",
+        jacksonDatabind:       "com.fasterxml.jackson.core:jackson-databind:2.5.1",
+        jacksonDataformat:     "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.5.1",
+        jacksonJson:           "com.github.pgelinas:jackson-javax-json:0.9.0",
+        jacksonMapper:         "org.codehaus.jackson:jackson-mapper-asl:1.9.9",
+        junit:                 "junit:junit:4.11",
+        log4j:                 "log4j:log4j:1.2.17",
+        mockitoCore:           "org.mockito:mockito-core:2.0.31-beta",
+        powerMock:             "org.powermock:powermock-api-mockito:1.6.5",
+        powerMockJUnit:        "org.powermock:powermock-module-junit4:1.6.5",
+        slf4j:                 "org.slf4j:slf4j-api:1.7.12",
+        slf4jSimple:           "org.slf4j:slf4j-simple:1.7.12"
+]

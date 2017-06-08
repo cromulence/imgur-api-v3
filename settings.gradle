@@ -1,0 +1,5 @@
+rootProject.name = 'imgur-api-v3'
+
+include ':api'
+
+include ':impl'
