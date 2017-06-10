@@ -33,12 +33,24 @@ public class ImgurEndpointTest {
     private static PersistingOAuthHandler user1Auth;
     private static PersistingOAuthHandler user2Auth;
 
-    private static String path = "./src/test/resources/test.properties";
+    private static String[] propertiesPaths = new String[]{"./impl/src/test/resources/test.properties", "./src/test/resources/test.properties", "~/test.properties"};
 
     @BeforeClass
     public static void setup() throws Exception {
 
-        propertiesFile = new File(path);
+        propertiesFile = null;
+
+        for(String path : propertiesPaths) {
+            File file = new File(path);
+            if(file.exists() && file.isFile()&& file.canRead() && file.length() > 0) {
+                propertiesFile = file;
+                break;
+            }
+        }
+
+        if(propertiesFile == null) {
+            throw new IllegalStateException("Unable to find test.properties");
+        }
 
         System.out.println(propertiesFile.getAbsolutePath());
 
@@ -101,8 +113,6 @@ public class ImgurEndpointTest {
     }
 
     public static void main(String[] args) throws Exception {
-        path = "./impl" + path;
-
         setup();
     }
 
