@@ -89,8 +89,8 @@ subprojects {
             events 'skipped', 'failed'
 
             // Projects may decide to enable extra logging for tests
-            // events 'started', 'passed'         // Log start and passed events
-           showStandardStreams = true        // Show console output from the running tests
+            // events 'started', 'passed'        // Log start and passed events
+            // showStandardStreams = true        // Show console output from the running tests
 
         }
     }
