@@ -28,4 +28,5 @@ deploy:
   dry-run: false
 after_success:
   - aws --debug --region=eu-west-2 s3 cp ~/test.properties s3://cromulence.travis.imgur-api-v3/test.properties
+after_failure: "cat /home/travis/build/cromulence/imgur-api-v3/api/build/tmp/javadoc/javadoc.options"
 
