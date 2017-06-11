@@ -4,6 +4,8 @@ jdk:
 before_install:
 - pip install --user awscli
 - aws --debug --region=eu-west-2 s3 cp s3://cromulence.travis.imgur-api-v3/test.properties ~/test.properties
+script:
+- "./gradlew check -x test"
 before_deploy:
 - "./gradlew --stacktrace sourceJar javadocJar generatePomFileForMavenPublication
   copyBintrayTemplate -x test"
