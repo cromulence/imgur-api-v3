@@ -39,37 +39,20 @@ public class ImgurEndpointTest {
     public static void setup() throws Exception {
 
         propertiesFile = null;
-        
-        System.out.println("setup in");
-         System.err.println("setup in");
 
         for(String path : propertiesPaths) {
-            System.out.println("trying " + path);
-            System.err.println("trying " + path);
             File parent = new File(path);
             File file = new File(parent, "test.properties");
             if(file.exists() && file.isFile()&& file.canRead() && file.length() > 0) {
                 propertiesFile = file;
-                System.out.println("found");
-                    System.err.println("found");
+                LOG.info("found test.properties at {}", file.getAbsolutePath());
                 break;
-            } else if (parent.exists() && parent.isDirectory() && parent.canRead()) {
-                System.out.println("Unable to find test.properties in " + parent.getAbsolutePath() + " files present are:");
-                for(File f : parent.listFiles()) {
-                    System.out.println(f.getName());
-                    System.err.println(f.getName());
-                }
-            } else {
-                System.out.println("not there");
-                System.err.println("not there");
-                }
+            }
         }
 
         if(propertiesFile == null) {
             throw new IllegalStateException("Unable to find test.properties");
         }
-
-        System.out.println(propertiesFile.getAbsolutePath());
 
         PropertiesFileDataStoreConnector propertiesFileDataStoreConnector = new PropertiesFileDataStoreConnector(propertiesFile);
 
@@ -104,7 +87,6 @@ public class ImgurEndpointTest {
         getUser2ImgurUnderTest().AUTH_UTILS.refreshToken();
     }
 
-
     public static Imgur getUser1ImgurUnderTest() {
         return user1ImgurUnderTest;
     }
@@ -121,20 +103,20 @@ public class ImgurEndpointTest {
         return user2Auth;
     }
 
-    public static void dump(Object o) {
-        LOG.info(new GsonBuilder().setPrettyPrinting().create().toJson(o));
+    public static void dump(Logger logger, Object o) {
+        logger.info(new GsonBuilder().setPrettyPrinting().create().toJson(o));
     }
 
-    public static void dump(String label, Object o) {
-        LOG.info("\n\n\n" + label + "\n" + new GsonBuilder().setPrettyPrinting().create().toJson(o));
+    public static void dump(Logger logger, String label, Object o) {
+        logger.info("\n\n\n" + label + "\n" + new GsonBuilder().setPrettyPrinting().create().toJson(o));
     }
 
     public static void main(String[] args) throws Exception {
         setup();
     }
 
-    protected void pause(String s, long i) {
-        LOG.info(s);
+    protected void pause(Logger logger, String s, long i) {
+        logger.info(s);
         try {
             Thread.sleep(i);
         } catch (InterruptedException e) {
