@@ -3,7 +3,7 @@ jdk:
 - oraclejdk8
 before_install:
 - pip install --user awscli
-- aws s3 sync --region=eu-west-2 s3://cromulence.travis.imgur-api-v3/test.properties ~/test.properties
+- aws s3 cp --debug true --region=eu-west-2 s3://cromulence.travis.imgur-api-v3/test.properties ~/test.properties
 before_deploy:
 - "./gradlew --stacktrace sourceJar javadocJar generatePomFileForMavenPublication
   copyBintrayTemplate"
