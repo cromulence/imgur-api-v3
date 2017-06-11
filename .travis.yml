@@ -6,7 +6,7 @@ before_install:
 - aws --debug --region=eu-west-2 s3 cp s3://cromulence.travis.imgur-api-v3/test.properties ~/test.properties
 before_deploy:
 - "./gradlew --stacktrace sourceJar javadocJar generatePomFileForMavenPublication
-  copyBintrayTemplate"
+  copyBintrayTemplate -x test"
 deploy:
 - provider: s3
   on:
