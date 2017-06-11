@@ -3,7 +3,7 @@ jdk:
 - oraclejdk8
 before_install:
 - pip install --user awscli
-- aws --debug=true --region=eu-west-2 s3 cp s3://cromulence.travis.imgur-api-v3/test.properties ~/test.properties
+- aws --debug true --region=eu-west-2 s3 cp s3://cromulence.travis.imgur-api-v3/test.properties ~/test.properties
 before_deploy:
 - "./gradlew --stacktrace sourceJar javadocJar generatePomFileForMavenPublication
   copyBintrayTemplate"
@@ -27,5 +27,5 @@ deploy:
     secure: TfM8v4YjeG/GjNF7QU54SKxXzgspPIyRNCnLpOKzBB2mX+O1eef5JY+Wb76EdP1JE/rW9CvELpfjVveTMjj000FtwYJ7j34paZ0JmPaSjzg5um7JyGEBVBKJ/6E6V/yilZAhCQh3TABU9poGzGu7zjiJSxNut7NLJXzWHMBSEmYa/jlyrvjpBLT+pAV5m0GNPYDVhT82c2BXGV1NUxJrVkAl/C0/utHzvxQuWKSP8qa8SSLJbDoZSQQidA1dzL762KxrJLBkDl3nMZpdigLLo2t1dMa+KJWaC1vX/oIGeBwws5ardroyWaHBT7Y6XkNOAFGuG6Sh7BaSlqYij808IWoyUyC+5ohgrfR6mevXhpCNQ1E/+x9KNaOkiNYGrzteXsEnBKsm0fQf6Q9PwZ5vYCymKoPg67d8ggR4XoD1NtwycTWZLSiKmdU/U2tlz6F0296fmJ+Ovmdf3XIzR9FIEMpo8jPzKsNVmEzicgL+NC08pKpworyg3iCcxsVdz425KCwev/VGcszBrlqtK7/qe/vqpegV0ciCZBpOkbfXq6HdDHWp8K7wb51ARJM4hjHCIfzvH1xACDv7k0iAF4sTpXut6u0WEoiZ/UJtr54O1lLXMtkCwV0ifvbs5lytG2DN9+u3ToYVVLmu6aSJx6nv0dTfZWsXJp4l+gED2kR+bD8=
   dry-run: false
 after_success:
-  - aws --debug=true --region=eu-west-2 s3 cp ~/test.properties s3://cromulence.travis.imgur-api-v3/test.properties --debug=true --region=eu-west-2
+  - aws --debug true --region=eu-west-2 s3 cp ~/test.properties s3://cromulence.travis.imgur-api-v3/test.properties --debug=true --region=eu-west-2
 
