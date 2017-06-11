@@ -13,8 +13,12 @@ import net.cromulence.imgur.apiv3.datamodel.Trophy;
 import net.cromulence.imgur.apiv3.datamodel.constants.AccountCommentSort;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AccountEndpointTest extends ImgurEndpointTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AccountEndpointTest.class);
 
     private static final String UPDATED_BIO = "different bio for testing";
 
@@ -99,7 +103,7 @@ public class AccountEndpointTest extends ImgurEndpointTest {
         do {
             next = galleryFavourites.next();
 
-            dump(next);
+            dump(LOG, next);
         } while (next.length > 0);
     }
 
@@ -112,7 +116,7 @@ public class AccountEndpointTest extends ImgurEndpointTest {
         do {
             next = galleryFavourites.next();
 
-            dump(next);
+            dump(LOG, next);
         } while (next.length > 0);
     }
 }

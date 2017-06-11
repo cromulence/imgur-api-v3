@@ -63,7 +63,7 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
 
         Image upload = getUser1ImgurUnderTest().IMAGE.uploadImage(details);
 
-        dump("Uploaded image", upload);
+        dump(LOG, "Uploaded image", upload);
 
         uploadId = upload.getId();
 
@@ -71,16 +71,16 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
 
         boolean b = getUser1ImgurUnderTest().GALLERY.shareImageWithCommunity(upload);
 
-        dump("shared to gallery?", b);
+        dump(LOG, "shared to gallery?", b);
 
         assertTrue("Should have been shared to gallery", b);
 
         // Wait for it to get to the gallery before looking to comment on it
         Thread.sleep(20000);
         {
-            dump("aliceViewOfImage before approval", getUser1ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
+            dump(LOG, "aliceViewOfImage before approval", getUser1ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
 
-            dump("bobViewOfImage before approval", getUser2ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
+            dump(LOG, "bobViewOfImage before approval", getUser2ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
         }
         Thread.sleep(40000);
 
@@ -88,7 +88,7 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
         String commentId = getUser2ImgurUnderTest().COMMENT.addComment(upload.getId(), "Bob comments");
 
         // Wait for the comment to notify
-        pause("waiting for notification to come thru", 20000);
+        pause(LOG, "waiting for notification to come thru", 20000);
 
         {
             // get u1 new notifications, confirm none for comment on post
@@ -165,9 +165,9 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
         assertEquals("should be no replies", 0, replies.length);
 
         {
-            dump("aliceViewOfImage after approval", getUser1ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
+            dump(LOG, "aliceViewOfImage after approval", getUser1ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
 
-            dump("bobViewOfImage after approval", getUser2ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
+            dump(LOG, "bobViewOfImage after approval", getUser2ImgurUnderTest().GALLERY.getGalleryImage(upload.getId()));
         }
 
 

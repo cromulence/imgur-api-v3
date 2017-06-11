@@ -45,7 +45,7 @@ public class TopicEndpointIntegrationTest extends ImgurEndpointTest {
                     topicItem = getUser1ImgurUnderTest().TOPIC.getTopicItem(topicName, item.get().getId());
                 }
 
-                dump("topic item", topicItem);
+                dump(LOG, "topic item", topicItem);
             }
         }
     }
