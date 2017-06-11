@@ -41,6 +41,8 @@ public class ImgurEndpointTest {
         propertiesFile = null;
 
         for(String path : propertiesPaths) {
+            System.out.println("trying " + path);
+            System.err.println("trying " + path);
             File parent = new File(path);
             File file = new File(parent, "test.properties");
             if(file.exists() && file.isFile()&& file.canRead() && file.length() > 0) {
@@ -50,8 +52,12 @@ public class ImgurEndpointTest {
                 System.out.println("Unable to find test.properties in " + parent.getAbsolutePath() + " files present are:");
                 for(File f : parent.listFiles()) {
                     System.out.println(f.getName());
+                    System.err.println(f.getName());
                 }
-            }
+            } else {
+                System.out.println("not there");
+                System.err.println("not there");
+                }
         }
 
         if(propertiesFile == null) {
