@@ -33,7 +33,7 @@ public class ImgurEndpointTest {
     private static PersistingOAuthHandler user1Auth;
     private static PersistingOAuthHandler user2Auth;
 
-    private static String[] propertiesPaths = new String[]{"./impl/src/test/resources", "./src/test/resources", "~"};
+    private static String[] propertiesPaths = new String[]{"./impl/src/test/resources", "./src/test/resources", "/home/travis"};
 
     @BeforeClass
     public static void setup() throws Exception {
