@@ -33,7 +33,7 @@ public class ImgurEndpointTest {
     private static PersistingOAuthHandler user1Auth;
     private static PersistingOAuthHandler user2Auth;
 
-    private static String[] propertiesPaths = new String[]{"./impl/src/test/resources/test.properties", "./src/test/resources/test.properties", "~/test.properties"};
+    private static String[] propertiesPaths = new String[]{"./impl/src/test/resources", "./src/test/resources", "~"};
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -41,10 +41,16 @@ public class ImgurEndpointTest {
         propertiesFile = null;
 
         for(String path : propertiesPaths) {
-            File file = new File(path);
+            File parent = new File(path);
+            File file = new File(parent, "test.properties");
             if(file.exists() && file.isFile()&& file.canRead() && file.length() > 0) {
                 propertiesFile = file;
                 break;
+            } else if (parent.exists() && parent.isDirectory() && parent.canRead()) {
+                System.out.println("Unable to find test.properties in " + parent.getAbsolutePath() + " files present are:");
+                for(File f : parent.listFiles()) {
+                    System.out.println(f.getName());
+                }
             }
         }
 
