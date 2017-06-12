@@ -7,8 +7,8 @@ import net.cromulence.datawrapper.DataWrapperImpl;
 import net.cromulence.datawrapper.properties.PropertiesFileDataStoreConnector;
 import net.cromulence.imgur.apiv3.ImgurDatastore;
 import net.cromulence.imgur.apiv3.ImgurOAuthDataImpl;
-import net.cromulence.imgur.apiv3.ImgurOAuthUtils;
 import net.cromulence.imgur.apiv3.api.Imgur;
+import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.auth.PersistingOAuthHandler;
 
@@ -17,7 +17,10 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class ImgurEndpointTest {
 
@@ -70,11 +73,11 @@ public class ImgurEndpointTest {
         user2ImgurUnderTest = new Imgur(data, user2Auth);
 
         if (!user1Auth.hasValidAccessToken()) {
-            ImgurOAuthUtils.getAndExchangePin(user1ImgurUnderTest, user1Auth, user1AuthData.getUsername());
+            getAndExchangePin(user1ImgurUnderTest, user1Auth, user1AuthData.getUsername());
         }
 
         if (!user2Auth.hasValidAccessToken()) {
-            ImgurOAuthUtils.getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
+            getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
         }
 
         getUser1ImgurUnderTest().AUTH.refreshToken();
@@ -122,5 +125,19 @@ public class ImgurEndpointTest {
         } catch (InterruptedException e) {
             // noop
         }
+    }
+
+    private static void getAndExchangePin(Imgur imgur, ImgurOAuthHandler ah, String user) throws IOException, ApiRequestException {
+
+        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s&state=%s", imgur.AUTH.getEndpointUrl(), imgur.DATA.getClientId(), user);
+
+        System.out.println(user);
+        System.out.println(pinLoginUrl);
+
+        BufferedReader bin = new BufferedReader(new InputStreamReader(System.in));
+
+        String readLine = bin.readLine();
+
+        imgur.AUTH.exchangePin(readLine, ah);
     }
 }
