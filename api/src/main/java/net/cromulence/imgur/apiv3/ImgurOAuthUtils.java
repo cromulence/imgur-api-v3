@@ -12,7 +12,7 @@ public class ImgurOAuthUtils {
 
     public static void getAndExchangePin(Imgur imgur, ImgurOAuthHandler ah, String user) throws IOException, ApiRequestException {
 
-        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s&state=%s", imgur.AUTH_UTILS.getEndpointUrl(), imgur.DATA.getClientId(), user);
+        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s&state=%s", imgur.AUTH.getEndpointUrl(), imgur.DATA.getClientId(), user);
 
         System.out.println(user);
         System.out.println(pinLoginUrl);
@@ -21,6 +21,6 @@ public class ImgurOAuthUtils {
 
         String readLine = bin.readLine();
 
-        imgur.AUTH_UTILS.exchangePin(readLine, ah);
+        imgur.AUTH.exchangePin(readLine, ah);
     }
 }

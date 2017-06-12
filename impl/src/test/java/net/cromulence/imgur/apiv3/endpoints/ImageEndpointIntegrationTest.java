@@ -21,7 +21,7 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
     @Test
     public void getAnonymousImageMethods() throws Exception {
 
-        getUser1ImgurUnderTest().AUTH_UTILS.refreshToken();
+        getUser1ImgurUnderTest().AUTH.refreshToken();
 
         // upload
         ImageUploadDetailsBuilder builder = new ImageUploadDetailsBuilder(getClass().getResourceAsStream("/testcard.png"));
@@ -73,7 +73,7 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
     @Test
     public void getAuthenticatedImageMethods() throws Exception {
 
-        getUser1ImgurUnderTest().AUTH_UTILS.refreshToken();
+        getUser1ImgurUnderTest().AUTH.refreshToken();
 
         // upload
         ImageUploadDetailsBuilder builder = new ImageUploadDetailsBuilder(getClass().getResourceAsStream("/testcard.png"));

@@ -1,42 +1,49 @@
 package net.cromulence.imgur.apiv3.datamodel;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class AuthResponse implements Serializable {
-    private String access_token;
+    @SerializedName("access_token")
+    private String accessToken;
 
-    private int expires_in;
+    @SerializedName("expires_in")
+    private int expiresIn;
 
-    private String token_type;
+    @SerializedName("token_type")
+    private String tokenType;
 
     private String scope;
 
-    private String refresh_token;
+    @SerializedName("refresh_token")
+    private String refreshToken;
 
-    private String account_username;
+    @SerializedName("account_username")
+    private String accountUsername;
 
-    public String getAccess_token() {
-        return access_token;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
-    public int getExpires_in() {
-        return expires_in;
+    public int getExpiresIn() {
+        return expiresIn;
     }
 
-    public void setExpires_in(int expires_in) {
-        this.expires_in = expires_in;
+    public void setExpiresIn(int expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
-    public String getToken_type() {
-        return token_type;
+    public String getTokenType() {
+        return tokenType;
     }
 
-    public void setToken_type(String token_type) {
-        this.token_type = token_type;
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
     }
 
     public String getScope() {
@@ -47,19 +54,19 @@ public class AuthResponse implements Serializable {
         this.scope = scope;
     }
 
-    public String getRefresh_token() {
-        return refresh_token;
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
-    public void setRefresh_token(String refresh_token) {
-        this.refresh_token = refresh_token;
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
-    public String getAccount_username() {
-        return account_username;
+    public String getAccountUsername() {
+        return accountUsername;
     }
 
-    public void setAccount_username(String account_username) {
-        this.account_username = account_username;
+    public void setAccountUsername(String accountUsername) {
+        this.accountUsername = accountUsername;
     }
 }

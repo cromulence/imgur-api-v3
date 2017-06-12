@@ -1,7 +1,7 @@
 package net.cromulence.imgur.apiv3.api;
 
 import net.cromulence.imgur.apiv3.ImgurApplicationData;
-import net.cromulence.imgur.apiv3.auth.AuthUtils;
+import net.cromulence.imgur.apiv3.endpoints.AuthEndpoint;
 import net.cromulence.imgur.apiv3.auth.DefaultAuthHandler;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.endpoints.AccountEndpoint;
@@ -21,9 +21,9 @@ public class Imgur {
 
     public final HttpUtils HTTP;
 
-    public final ImgurOAuthHandler AUTH;
-    public final AuthUtils AUTH_UTILS;
+    public final ImgurOAuthHandler AUTH_HANDLER;
 
+    public final AuthEndpoint AUTH;
     public final AccountEndpoint ACCOUNT;
     public final CommentEndpoint COMMENT;
     public final CreditsEndpoint CREDITS;
@@ -45,8 +45,7 @@ public class Imgur {
         this(data, null, auth);
     }
 
-    public Imgur(ImgurApplicationData data, SSLContext ctx, ImgurOAuthHandler auth) {
-
+    public Imgur(ImgurApplicationData data, SSLContext ctx, ImgurOAuthHandler authHandler) {
         DATA = data;
 
         if (ctx == null) {
@@ -55,15 +54,15 @@ public class Imgur {
             HTTP = new HttpUtils(this, ctx);
         }
 
-        AUTH = auth;
-        AUTH_UTILS = new AuthUtils(this);
+        AUTH_HANDLER = authHandler;
 
+        AUTH    = new AuthEndpoint(this);
         ACCOUNT = new AccountEndpoint(this);
-        ALBUM = new AlbumEndpoint(this);
+        ALBUM   = new AlbumEndpoint(this);
         COMMENT = new CommentEndpoint(this);
         CREDITS = new CreditsEndpoint(this);
         GALLERY = new GalleryEndpoint(this);
-        IMAGE = new ImageEndpoint(this);
+        IMAGE   = new ImageEndpoint(this);
         NOTIFICATION = new NotificationEndpoint(this);
         TOPIC = new TopicEndpoint(this);
     }

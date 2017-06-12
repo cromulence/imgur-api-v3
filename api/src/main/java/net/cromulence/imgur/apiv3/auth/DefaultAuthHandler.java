@@ -15,12 +15,12 @@ public class DefaultAuthHandler extends AbstractAuthHandler {
 
     @Override
     public void handleAuth(AuthResponse ar) {
-        refreshToken = ar.getRefresh_token();
-        accessToken = ar.getAccess_token();
-        accessTokenTimeout = ar.getExpires_in();
+        refreshToken = ar.getRefreshToken();
+        accessToken = ar.getAccessToken();
+        accessTokenTimeout = ar.getExpiresIn();
 
-        long now = System.currentTimeMillis();
-        accessTokenTimeout = now + (ar.getExpires_in() * 1000L);
+        final long now = System.currentTimeMillis();
+        accessTokenTimeout = now + (ar.getExpiresIn() * 1000L);
         LOG.info("handleAuth: now {} timeout {}", now, accessTokenTimeout);
     }
 

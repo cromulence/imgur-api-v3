@@ -25,6 +25,7 @@ import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.datamodel.Album;
 import net.cromulence.imgur.apiv3.datamodel.AlbumImpl;
 import net.cromulence.imgur.apiv3.datamodel.ApiError;
+import net.cromulence.imgur.apiv3.datamodel.AuthResponse;
 import net.cromulence.imgur.apiv3.datamodel.Comment;
 import net.cromulence.imgur.apiv3.datamodel.Conversation;
 import net.cromulence.imgur.apiv3.datamodel.ErrorDetails;
@@ -303,19 +304,17 @@ public class HttpUtils implements HttpInspector {
     /**
      * Perform a HTTP request for an initial auth request (logging in)
      */
-    public ApiResponse initialAuth(String url, List<NameValuePair> params) throws ApiRequestException, ImgurApiTimeoutException {
+    public AuthResponse initialAuth(String url, List<NameValuePair> params) throws ApiRequestException, ImgurApiTimeoutException {
         return auth(url, params, false);
     }
 
     /**
      * Perform a HTTP request for an auth request
      */
-    public ApiResponse auth(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
-        ApiResponse apiResponse = rawPost(url, params, authenticated);
+    public AuthResponse auth(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+        final ApiResponse apiResponse = rawPost(url, params, authenticated);
 
-        LOG.debug("Auth Response: {}", apiResponse);
-
-        return apiResponse;
+        return new Gson().fromJson(apiResponse.getResponseBody(), AuthResponse.class);
     }
 
     /**
@@ -354,7 +353,7 @@ public class HttpUtils implements HttpInspector {
     }
 
     /**
-     * erform a HTTP POST
+     * Perform a HTTP POST
      * @param url URL to post to
      * @param authenticated Set true if the reqiest should be authenticated
      * @param params Request parameters
@@ -642,7 +641,7 @@ public class HttpUtils implements HttpInspector {
         ImgurOAuthHandler ah;
 
         if (authenticated) {
-            ah = getImgur().AUTH;
+            ah = getImgur().AUTH_HANDLER;
             req.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + ah.getAccessToken());
         } else {
             ah = null;

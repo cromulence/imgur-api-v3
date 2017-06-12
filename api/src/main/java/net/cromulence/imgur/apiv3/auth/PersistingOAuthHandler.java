@@ -17,11 +17,11 @@ public class PersistingOAuthHandler extends AbstractAuthHandler {
 
     @Override
     public void handleAuth(AuthResponse ar) {
-        data.setUsername(ar.getAccount_username());
-        data.setAccessToken(ar.getAccess_token());
-        data.setRefreshToken(ar.getRefresh_token());
+        data.setUsername(ar.getAccountUsername());
+        data.setAccessToken(ar.getAccessToken());
+        data.setRefreshToken(ar.getRefreshToken());
         long now = System.currentTimeMillis();
-        long accessTokenTimeout = now + (ar.getExpires_in() * 1000L);
+        long accessTokenTimeout = now + (ar.getExpiresIn() * 1000L);
         data.setAccessTokenTimeout(accessTokenTimeout);
         LOG.info("handleAuth: {} now {} timeout {}", data.getUsername(), now, accessTokenTimeout);
     }

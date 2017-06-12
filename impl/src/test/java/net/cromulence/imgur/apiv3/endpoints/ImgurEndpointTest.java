@@ -77,14 +77,14 @@ public class ImgurEndpointTest {
             ImgurOAuthUtils.getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
         }
 
-        getUser1ImgurUnderTest().AUTH_UTILS.refreshToken();
-        getUser2ImgurUnderTest().AUTH_UTILS.refreshToken();
+        getUser1ImgurUnderTest().AUTH.refreshToken();
+        getUser2ImgurUnderTest().AUTH.refreshToken();
     }
 
     @Before
     public void refreshTokens() throws Exception {
-        getUser1ImgurUnderTest().AUTH_UTILS.refreshToken();
-        getUser2ImgurUnderTest().AUTH_UTILS.refreshToken();
+        getUser1ImgurUnderTest().AUTH.refreshToken();
+        getUser2ImgurUnderTest().AUTH.refreshToken();
     }
 
     public static Imgur getUser1ImgurUnderTest() {
