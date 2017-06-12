@@ -7,7 +7,7 @@ before_install:
 script:
 - "./gradlew check -x test"
 before_deploy:
-- "./gradlew --info --stacktrace sourceJar javadocJar generatePomFileForMavenPublication
+- "./gradlew --stacktrace sourceJar javadocJar generatePomFileForMavenPublication
   copyBintrayTemplate -x test"
 deploy:
 - provider: s3
@@ -29,17 +29,5 @@ deploy:
     secure: TfM8v4YjeG/GjNF7QU54SKxXzgspPIyRNCnLpOKzBB2mX+O1eef5JY+Wb76EdP1JE/rW9CvELpfjVveTMjj000FtwYJ7j34paZ0JmPaSjzg5um7JyGEBVBKJ/6E6V/yilZAhCQh3TABU9poGzGu7zjiJSxNut7NLJXzWHMBSEmYa/jlyrvjpBLT+pAV5m0GNPYDVhT82c2BXGV1NUxJrVkAl/C0/utHzvxQuWKSP8qa8SSLJbDoZSQQidA1dzL762KxrJLBkDl3nMZpdigLLo2t1dMa+KJWaC1vX/oIGeBwws5ardroyWaHBT7Y6XkNOAFGuG6Sh7BaSlqYij808IWoyUyC+5ohgrfR6mevXhpCNQ1E/+x9KNaOkiNYGrzteXsEnBKsm0fQf6Q9PwZ5vYCymKoPg67d8ggR4XoD1NtwycTWZLSiKmdU/U2tlz6F0296fmJ+Ovmdf3XIzR9FIEMpo8jPzKsNVmEzicgL+NC08pKpworyg3iCcxsVdz425KCwev/VGcszBrlqtK7/qe/vqpegV0ciCZBpOkbfXq6HdDHWp8K7wb51ARJM4hjHCIfzvH1xACDv7k0iAF4sTpXut6u0WEoiZ/UJtr54O1lLXMtkCwV0ifvbs5lytG2DN9+u3ToYVVLmu6aSJx6nv0dTfZWsXJp4l+gED2kR+bD8=
   dry-run: false
 after_success:
-  - aws --debug --region=eu-west-2 s3 cp ~/test.properties s3://cromulence.travis.imgur-api-v3/test.properties
-after_failure:
-- provider: s3
-  on:
-    all_branches: true
-  upload-dir: output
-  bucket: cromulence.travis.imgur-api-v3
-  region: eu-west-2
-  skip_cleanup: true
-  access_key_id: AKIAJAAE254CVSJG4RTQ
-  secret_access_key:
-    secure: oFqx+lFS3LP6/Mn0z8EhWvECTJM6vjlhjssl7X/kcGYo2JgOJ1meBoDGTr4XHCnYOLH3mBOWyj6ql//IyYresrGZ9NHpwt0uAzFwzubQjPkt0txRXUKnhig4Abnc8fGyR0Z2Jo0ZLUwXN6ybZqefv3+nWkZpFBeRKjEkkEJSU2Cvfixmkvhi82mpQlJGQf+/vxO8jjm7XIK60Bm/XQT/XqAGl6AGVzP4woHaE6cDeax9cKLVDZ/C5C18akwRX0alAKtFS0QJiwPxWzcj4BAijYbBf3pC4KfExTWslotVu2/6zOO4cxw/EXez8bKUKwHUzygLU0l2Ze6RCNNI4jDV3bQXVcSXHvFFHni+HCXDPj+8iSXABu8pgkGv8WWXbutyBTbnBRkyqF5KlCpfFjr6BzoYWC5eYgIPKjICm7auS9sfQfF1suQ4eEMtT37hiCSvyzUozhcoibkWXgXcHKtzH4kl+czBCiL1ujsBzp+RaF53R4YGkqfKs0QFgd3ocI6A+WSojd+Te8a3y0NlrfPUYrk03YeoJjvWl2epz8DefgLaZZz0kdGQrBbq5mfbWXQMDynqdksuuf51/FP6LwHdgUUS/Atl0P75OgbgZmbjEBEnNsG80v+etisxXcFvlP2ZwmIg/9LIPJ5+ipL77F7pQYftSFme1MQ+jmABPnAIwUE=
-- script: "cat /home/travis/build/cromulence/imgur-api-v3/api/build/tmp/javadoc/javadoc.options"
+- aws --debug --region=eu-west-2 s3 cp ~/test.properties s3://cromulence.travis.imgur-api-v3/test.properties
 
