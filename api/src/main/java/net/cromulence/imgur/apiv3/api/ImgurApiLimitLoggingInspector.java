@@ -1,6 +1,7 @@
 package net.cromulence.imgur.apiv3.api;
 
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
+import net.cromulence.imgur.apiv3.datamodel.Credits;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -12,11 +13,20 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
 
     private static final Logger LOG = LoggerFactory.getLogger(ImgurApiLimitLoggingInspector.class);
 
-    private static final String PREFIX = "X-Post-Rate-Limit-";
+    private static final String POST_PREFIX = "X-Post-Rate-Limit-";
+    private static final String CLIENT_PREFIX = "X-RateLimit-Client";
+    private static final String USER_PREFIX = "X-RateLimit-User";
 
-    private static final String HEADER_LIMIT = PREFIX + "Limit";
-    private static final String HEADER_REMAINING = PREFIX + "Remaining";
-    private static final String HEADER_RESET = PREFIX + "Reset";
+    private static final String HEADER_POST_LIMIT = POST_PREFIX + "Limit";
+    private static final String HEADER_POST_REMAINING = POST_PREFIX + "Remaining";
+    private static final String HEADER_POST_RESET = POST_PREFIX + "Reset";
+
+    private static final String HEADER_CLIENT_LIMIT = CLIENT_PREFIX + "Limit";
+    private static final String HEADER_CLIENT_REMAINING = CLIENT_PREFIX + "Remaining";
+
+    private static final String HEADER_USER_LIMIT = USER_PREFIX + "Limit";
+    private static final String HEADER_USER_REMAINING = USER_PREFIX + "Remaining";
+    private static final String HEADER_USER_RESET = USER_PREFIX + "Reset";
 
     /** Fraction at which warnings start */
     private static final int FRACTION = 10;
@@ -35,45 +45,85 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
     @Override
     public void postExecute(HttpRequestBase req, HttpResponse response, ImgurOAuthHandler ah) {
 
+        if(req.getURI().toString().equals(imgur.ACCOUNT.getEndpointUrl()) ||
+           req.getURI().toString().contains(imgur.CREDITS.getEndpointUrl())) {
+            // account and credits endpoints don't return limit headers - no cost endpoints?
+            return;
+        }
 
         // TODO
-        //Access-Control-Expose-Headers:
         // X-RateLimit-ClientLimit,
         // X-RateLimit-ClientRemaining,
         // X-RateLimit-UserLimit,
         // X-RateLimit-UserRemaining,
         // X-RateLimit-UserReset
 
-        // Check the response headers for the limit count
-        Header limitHeader = response.getFirstHeader(HEADER_LIMIT);
-        Header remainingHeader = response.getFirstHeader(HEADER_REMAINING);
-        Header resetHeader = response.getFirstHeader(HEADER_RESET);
+        Credits creds = new Credits();
 
-        if (limitHeader == null || remainingHeader == null || resetHeader == null) {
-            // account endpoint doesn't return limit headers - no cost endpoint?
-            if (!req.getURI().toString().contains("://api.imgur.com/3/account") &&
-                !req.getURI().toString().contains("://api.imgur.com/3/credits")) {
-                LOG.info("App rate limit headers not available for endpoint {}", req.getURI());
+        // Check the response headers for the post limit count
+        Header postLimitHeader = response.getFirstHeader(HEADER_POST_LIMIT);
+        Header postRemainingHeader = response.getFirstHeader(HEADER_POST_REMAINING);
+        Header postResetHeader = response.getFirstHeader(HEADER_POST_RESET);
+
+        if(req.getMethod().equalsIgnoreCase("POST")) {
+            if (postLimitHeader == null || postRemainingHeader == null || postResetHeader == null) {
+                LOG.info("App post rate limit headers not available on endpoint {}", req.getURI());
+            } else {
+
+                Integer postLimit = Integer.parseInt(postLimitHeader.getValue());
+                Integer postRemain = Integer.parseInt(postRemainingHeader.getValue());
+                String postReset = postResetHeader.getValue();
+
+                logLimit("Post", postLimit, postRemain, postReset);
+
+                creds.setPostLimit(postLimit);
+                creds.setPostRemaining(postRemain);
+                creds.setPostReset(Long.parseLong(postReset));
             }
-            return;
         }
 
-        Integer limit = Integer.parseInt(limitHeader.getValue());
-        Integer remaining = Integer.parseInt(remainingHeader.getValue());
-        String reset = resetHeader.getValue();
+        Header clientLimitHeader  = response.getFirstHeader(HEADER_CLIENT_LIMIT);
+        Header clientRemainHeader = response.getFirstHeader(HEADER_CLIENT_REMAINING);
+        Header userLimitHeader    = response.getFirstHeader(HEADER_USER_LIMIT);
+        Header userRemainHeader   = response.getFirstHeader(HEADER_USER_REMAINING);
+        Header userResetHeader    = response.getFirstHeader(HEADER_USER_RESET);
 
-        if (remaining == 0) {
+        if (clientLimitHeader == null || clientRemainHeader == null || userLimitHeader == null || userRemainHeader == null || userResetHeader == null) {
+            LOG.info("Client and user rate limit headers not available for endpoint {}", req.getURI());
+        } else {
+            Integer clientLimit = Integer.parseInt(postLimitHeader.getValue());
+            Integer clientRemain = Integer.parseInt(postRemainingHeader.getValue());
+            String clientReset = "?";
+
+            logLimit("Client", clientLimit, clientRemain, clientReset);
+
+            creds.setClientLimit(clientLimit);
+            creds.setClientRemaining(clientRemain);
+
+            Integer userLimit = Integer.parseInt(postLimitHeader.getValue());
+            Integer userRemain = Integer.parseInt(postRemainingHeader.getValue());
+            String userReset = postResetHeader.getValue();
+
+            logLimit("User", userLimit, userRemain, userReset);
+
+            creds.setUserLimit(userLimit);
+            creds.setUserRemaining(userRemain);
+            creds.setUserReset(Long.parseLong(userReset));
+        }
+
+        imgur.CREDITS.setCreditsFromResponse(creds);
+    }
+
+    private void logLimit(String type, int limit, int remain, String reset) {
+        if (remain == 0) {
             // We done fucked up bad
-            LOG.error("API Limit reached, resets on {}", reset);
-        } else if ((limit * FRACTION) < remaining) {
+            LOG.error("API {} Limit reached, resets on {}", type, reset);
+        } else if ((limit * FRACTION) < remain) {
             // things are getting ropey
-            LOG.warn("API Limit approaching - {} of {} remain, resets on {}", remaining, limit, reset);
+            LOG.warn("API {} Limit approaching - {} of {} remain, resets on {}", type, remain, limit, reset);
         } else {
             // All good
-            LOG.debug("API Limit ok - {} of {} remain, resets on {}", remaining, limit, reset);
+            LOG.debug("API {} Limit ok - {} of {} remain, resets on {}", type, remain, limit, reset);
         }
-
-        // TODO
-        // imgur.CREDITS.setHeaderLimitInfo(limit, remaining, reset);
     }
 }

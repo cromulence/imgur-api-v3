@@ -255,26 +255,19 @@ public class HttpUtils implements HttpInspector {
      */
 
     HttpUtils(Imgur imgur) {
-        this.imgur = imgur;
-
-        requestConfig = getRequestConfig();
-
-        client = HttpClients.createDefault();
-
-        complexGson = getComplexGson();
+        this(imgur, HttpClients.createDefault());
     }
 
     HttpUtils(Imgur imgur, SSLContext ctx) {
+        this(imgur, HttpClients.custom().setSSLSocketFactory(new SSLConnectionSocketFactory(ctx)).build());
+    }
 
+    private HttpUtils(Imgur imgur, HttpClient client) {
         this.imgur = imgur;
-
-        requestConfig = getRequestConfig();
-
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(ctx);
-
-        client = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-
-        complexGson = getComplexGson();
+        this.requestConfig = getRequestConfig();
+        this.client = client;
+        this.complexGson = getComplexGson();
+        this.addHttpInspector(new ImgurApiLimitLoggingInspector(imgur));
     }
 
     private static RequestConfig getRequestConfig() {
