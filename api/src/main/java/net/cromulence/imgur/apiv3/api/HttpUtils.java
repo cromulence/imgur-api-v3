@@ -18,7 +18,9 @@ import net.cromulence.imgur.apiv3.api.exceptions.ErrorResponseException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurApiTimeoutException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurRequestException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurServerException;
+import net.cromulence.imgur.apiv3.api.exceptions.NotAuthorizedException;
 import net.cromulence.imgur.apiv3.api.exceptions.NotFoundException;
+import net.cromulence.imgur.apiv3.api.exceptions.RateLimitedException;
 import net.cromulence.imgur.apiv3.api.exceptions.ResponseTypeException;
 import net.cromulence.imgur.apiv3.api.exceptions.UploadTooLargeException;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
@@ -75,10 +77,12 @@ public class HttpUtils implements HttpInspector {
 
     private static final int CONNECTION_TIMEOUT_MS = 10 * 1000;
 
-    // GSON instance which is configured with deserialisers
-    private final Gson GSON;
+    private static final int MAX_RETRIES = 3;
 
-    // Simple GSON instance
+    // gson instance which is configured with deserialisers
+    private final Gson complexGson;
+
+    // Simple gson instance
     private final Gson simpleGson = new Gson();
 
     // Imgur instance, used for getting other components
@@ -89,41 +93,7 @@ public class HttpUtils implements HttpInspector {
     private final RequestConfig requestConfig;
 
     // Request / respsonse interceptors
-    private final List<HttpInspector> httpInspectors = new ArrayList<HttpInspector>();
-
-    // TODO make this configurable
-    private int MAX_RETRIES = 3;
-
-    HttpUtils(Imgur imgur) {
-        this.imgur = imgur;
-
-        requestConfig = getRequestConfig();
-
-        client = HttpClients.createDefault();
-
-        GSON = getGson();
-    }
-
-    HttpUtils(Imgur imgur, SSLContext ctx) {
-
-        this.imgur = imgur;
-
-        requestConfig = getRequestConfig();
-
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(ctx);
-
-        client = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-
-        GSON = getGson();
-    }
-
-    private static RequestConfig getRequestConfig() {
-        return RequestConfig.custom()
-            .setConnectionRequestTimeout(CONNECTION_TIMEOUT_MS)
-            .setConnectTimeout(CONNECTION_TIMEOUT_MS)
-            .setSocketTimeout(CONNECTION_TIMEOUT_MS)
-            .build();
-    }
+    private final List<HttpInspector> httpInspectors = new ArrayList<>();
 
     /*
      * This is the section of JSON shame. All of the bodges required to get the
@@ -131,52 +101,53 @@ public class HttpUtils implements HttpInspector {
      * is mostly to blame, and trying to solve it with inheritance
      */
 
-    final JsonDeserializer imageDeserializer = new JsonDeserializer<Image>() {
+    private final JsonDeserializer imageDeserializer = new JsonDeserializer<Image>() {
 
         @Override
-        public Image deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Image deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
             return simpleGson.fromJson(json, ImageImpl.class);
         }
     };
 
-    final JsonDeserializer albumDeserializer = new JsonDeserializer<Album>() {
+    private final JsonDeserializer albumDeserializer = new JsonDeserializer<Album>() {
+
+        private static final String IMAGES = "images";
 
         @Override
-        public Album deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Album deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
             Image[] images = new Image[0];
 
-            if (json.getAsJsonObject().has("images")) {
-                JsonArray imagesJson = json.getAsJsonObject().get("images").getAsJsonArray();
-                json.getAsJsonObject().remove("images");
+            if (json.getAsJsonObject().has(IMAGES)) {
+                JsonArray imagesJson = json.getAsJsonObject().get(IMAGES).getAsJsonArray();
+                json.getAsJsonObject().remove(IMAGES);
 
                 images = new Image[imagesJson.size()];
 
-                // TODO do the images
                 for (int i = 0; i < imagesJson.size(); i++) {
                     images[i] = context.deserialize(imagesJson.get(i), ImageImpl.class);
                 }
             }
 
-            AlbumImpl album = simpleGson.fromJson(json, AlbumImpl.class);
+            final AlbumImpl album = simpleGson.fromJson(json, AlbumImpl.class);
             album.setImages(images);
 
             return album;
         }
     };
 
-    final JsonDeserializer galleryDeserializer = new JsonDeserializer<GalleryDetails>() {
+    private final JsonDeserializer galleryDeserializer = new JsonDeserializer<GalleryDetails>() {
         @Override
-        public GalleryDetails deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public GalleryDetails deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
             return simpleGson.fromJson(json, GalleryDetailsImpl.class);
         }
     };
 
-    final JsonDeserializer galleryEntryDeserializer = new JsonDeserializer<GalleryEntry>() {
+    private final JsonDeserializer galleryEntryDeserializer = new JsonDeserializer<GalleryEntry>() {
 
         @Override
         public GalleryEntry deserialize(JsonElement json,
-            Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            Type typeOfT, JsonDeserializationContext context) {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
 
@@ -192,9 +163,9 @@ public class HttpUtils implements HttpInspector {
         }
     };
 
-    final JsonDeserializer notifiableDeserializer = new JsonDeserializer<Notifiable>() {
+    private final JsonDeserializer notifiableDeserializer = new JsonDeserializer<Notifiable>() {
         @Override
-        public Notifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Notifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
             if (json.getAsJsonObject().has("comment")) {
                 return simpleGson.fromJson(json, Comment.class);
@@ -206,21 +177,23 @@ public class HttpUtils implements HttpInspector {
         }
     };
 
-    final JsonDeserializer<ApiError> apiErrorJsonDeserializer = new JsonDeserializer<ApiError>() {
+    private final JsonDeserializer<ApiError> apiErrorJsonDeserializer = new JsonDeserializer<ApiError>() {
+
+        private static final String ERROR = "error";
+
         @Override
-        public ApiError deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public ApiError deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
             JsonObject jo = json.getAsJsonObject();
-            if (jo.has("error")) {
-                if (jo.get("error").isJsonObject()) {
+            if (jo.has(ERROR)) {
+                if (jo.get(ERROR).isJsonObject()) {
                     return simpleGson.fromJson(json, typeOfT);
                 } else {
                     // It's a string, not an object. Fake out an object based on it
-                    String errorMessage = jo.remove("error").getAsString();
                     ApiError e = simpleGson.fromJson(json, typeOfT);
 
                     ErrorDetails ed = new ErrorDetails();
-                    ed.setMessage(errorMessage);
+                    ed.setMessage(jo.remove(ERROR).getAsString());
                     ed.setCode(-1);
                     ed.setType("ConvertedSimpleError");
 
@@ -234,9 +207,9 @@ public class HttpUtils implements HttpInspector {
         }
     };
 
-    final JsonDeserializer<Comment[]> commentArrayJsonDeserializer = new JsonDeserializer<Comment[]>() {
+    private final JsonDeserializer<Comment[]> commentArrayJsonDeserializer = new JsonDeserializer<Comment[]>() {
         @Override
-        public Comment[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public Comment[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
             if (json.isJsonArray()) {
                 return simpleGson.fromJson(json, Comment[].class);
@@ -247,27 +220,28 @@ public class HttpUtils implements HttpInspector {
         }
     };
 
-    final JsonDeserializer<String[]> stringArrayJsonDeserializer = new JsonDeserializer<String[]>() {
+    private final JsonDeserializer<String[]> stringArrayJsonDeserializer = new JsonDeserializer<String[]>() {
         @Override
-        public String[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public String[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
             List<String> toReturn = new ArrayList<>();
 
-            if (json.isJsonArray()) {
-                JsonArray ja = json.getAsJsonArray();
+            if (!json.isJsonArray()) {
+                return new String[0];
+            }
 
-                for (int i = 0; i < ja.size(); i++) {
-                    JsonElement jsonElement = ja.get(i);
+            final JsonArray ja = json.getAsJsonArray();
 
-                    if (jsonElement.isJsonPrimitive()) {
-                        JsonPrimitive asJsonPrimitive = jsonElement.getAsJsonPrimitive();
+            for (int i = 0; i < ja.size(); i++) {
+                JsonElement jsonElement = ja.get(i);
 
+                if (jsonElement.isJsonPrimitive()) {
+                    JsonPrimitive asJsonPrimitive = jsonElement.getAsJsonPrimitive();
 
-                        if (asJsonPrimitive.isNumber()) {
-                            toReturn.add(Long.toString(asJsonPrimitive.getAsNumber().longValue()));
-                        } else {
-                            toReturn.add(asJsonPrimitive.toString());
-                        }
+                    if (asJsonPrimitive.isNumber()) {
+                        toReturn.add(Long.toString(asJsonPrimitive.getAsNumber().longValue()));
+                    } else {
+                        toReturn.add(asJsonPrimitive.toString());
                     }
                 }
             }
@@ -276,7 +250,42 @@ public class HttpUtils implements HttpInspector {
         }
     };
 
-    private Gson getGson() {
+    /*
+     * Here ends JSON shame. Regular shame resumes.
+     */
+
+    HttpUtils(Imgur imgur) {
+        this.imgur = imgur;
+
+        requestConfig = getRequestConfig();
+
+        client = HttpClients.createDefault();
+
+        complexGson = getComplexGson();
+    }
+
+    HttpUtils(Imgur imgur, SSLContext ctx) {
+
+        this.imgur = imgur;
+
+        requestConfig = getRequestConfig();
+
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(ctx);
+
+        client = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+
+        complexGson = getComplexGson();
+    }
+
+    private static RequestConfig getRequestConfig() {
+        return RequestConfig.custom()
+            .setConnectionRequestTimeout(CONNECTION_TIMEOUT_MS)
+            .setConnectTimeout(CONNECTION_TIMEOUT_MS)
+            .setSocketTimeout(CONNECTION_TIMEOUT_MS)
+            .build();
+    }
+
+    private Gson getComplexGson() {
         return new GsonBuilder().
             registerTypeHierarchyAdapter(Image.class, imageDeserializer).
             registerTypeHierarchyAdapter(Album.class, albumDeserializer).
@@ -288,10 +297,6 @@ public class HttpUtils implements HttpInspector {
             registerTypeHierarchyAdapter(String[].class, stringArrayJsonDeserializer).
             create();
     }
-
-     /*
-      * Here ends JSON shame. Regular shame resumes.
-      */
 
     public void addHttpInspector(HttpInspector hi) {
         httpInspectors.add(hi);
@@ -571,22 +576,28 @@ public class HttpUtils implements HttpInspector {
     private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ImgurRequestException, ImgurServerException, ApiRequestException {
 
         // TODO identify some common errors in here and throw more accurate exceptions
-        final String responseData = GSON.toJson(response.getData());
-        final ApiError error = GSON.fromJson(responseData, ApiError.class);
+        final String responseData = complexGson.toJson(response.getData());
+        final ApiError error = complexGson.fromJson(responseData, ApiError.class);
 
         if (error.getErrorDetails() == null) {
             switch (response.getStatus()) {
+                case 403:
+                    throw new NotAuthorizedException(url);
                 case 404:
                     throw new NotFoundException(url);
+                case 429:
+                    throw new RateLimitedException(url);
+                default:
+                    throw new ApiRequestException("Unknown http error status received: " + response.getStatus());
             }
         } else {
+            if ("User Previously Verified".equals(error.getErrorDetails().getMessage())) {
+                throw new EmailAlreadyVerifiedException();
+            }
+
             switch (error.getErrorDetails().getCode()) {
                 case 1002: // File is over the size limit
                     throw new UploadTooLargeException();
-            }
-
-            if (error.getErrorDetails().getMessage().equals("User Previously Verified")) {
-                throw new EmailAlreadyVerifiedException();
             }
         }
 
@@ -596,7 +607,7 @@ public class HttpUtils implements HttpInspector {
     private BasicResponse getAsBasicResponse(ApiResponse response) throws ResponseTypeException {
         BasicResponse fromJson;
         try {
-            fromJson = GSON.fromJson(response.getResponseBody(), BasicResponse.class);
+            fromJson = complexGson.fromJson(response.getResponseBody(), BasicResponse.class);
         } catch (JsonSyntaxException e) {
             throw new ResponseTypeException("Unable to instantiate response as " + BasicResponse.class.getName() + "\n" + response, e);
         }
@@ -617,12 +628,10 @@ public class HttpUtils implements HttpInspector {
      * @throws ResponseTypeException
      */
     private <T> T typeResponse(BasicResponse response, TypeToken<T> type) throws ErrorResponseException, ResponseTypeException {
-        final String responseData = GSON.toJson(response.getData());
+        final String responseData = complexGson.toJson(response.getData());
 
         try {
-            T tt = GSON.fromJson(responseData, type.getType());
-
-            return tt;
+            return complexGson.fromJson(responseData, type.getType());
         } catch (JsonSyntaxException e) {
             throw new ResponseTypeException("Unable to instantiate response data as " + type.getRawType().getName() + "\n" + responseData, e);
         }
@@ -665,7 +674,24 @@ public class HttpUtils implements HttpInspector {
 
         postExecute(req, apiResponse.getResponse(), ah);
 
-        final Header[] clHeaders = apiResponse.getResponse().getHeaders("Content-Length");
+        final String cl = getContentLength(apiResponse.getResponse());
+
+        LOG.debug(String.format("http response: code[%d] message[%s] size[%s]", apiResponse.getStatusCode(), apiResponse.getReasonPhrase(), cl));
+
+        // TODO Do we need to deal with redirect?
+        if (apiResponse.getStatusCode() > 299) {
+            LOG.debug("Unable to " + req.getClass().getSimpleName() + " url[" + req.getURI() + "] statuscode[" + apiResponse.getStatusCode() + "] reason[" + apiResponse.getReasonPhrase() + "]");
+        }
+
+        if (apiResponse.getStatusCode() == 503) {
+            throw new ImgurServerException(apiResponse);
+        }
+
+        return apiResponse;
+    }
+
+    private String getContentLength(HttpResponse response) {
+        final Header[] clHeaders = response.getHeaders("Content-Length");
 
         String cl = "unknown";
 
@@ -679,37 +705,7 @@ public class HttpUtils implements HttpInspector {
             }
         }
 
-        LOG.debug(String.format("http response: code[%d] message[%s] size[%s]", apiResponse.getStatusCode(), apiResponse.getReasonPhrase(), cl));
-
-        // TODO Do we need to deal with redirect?
-        if (apiResponse.getStatusCode() > 299) {
-            LOG.debug("Unable to " + req.getClass().getSimpleName() + " url[" + req.getURI() + "] statuscode[" + apiResponse.getStatusCode() + "] reason[" + apiResponse.getReasonPhrase() + "]");
-        }
-
-        // TODO add these here
-//        if(status >= 400) {
-//            LOG.debug("doToken: error response");
-//            LOG.debug("doToken: response text: " + doPost.getResponseBody());
-//
-//            if(status == 403) {
-//                LOG.error("doToken: forbidden response");
-//            } else if(status == 429) {
-//                LOG.error("doToken: rate limited");
-//                printHeaders(doPost.getResponse(), new String[] {"X-RateLimit-UserLimit", "X-RateLimit-UserRemaining", "X-RateLimit-UserReset", "X-RateLimit-ClientLimit", "X-RateLimit-ClientRemaining", "X-Post-Rate-Limit-Limit", "X-Post-Rate-Limit-Remaining", "X-Post-Rate-Limit-Reset"});
-//            } else {
-//                LOG.error("doToken: unknown error response:" + status);
-//            }
-//
-//            // TODO any others?
-//
-//            return false;
-//        }
-
-        if (apiResponse.getStatusCode() == 503) {
-            throw new ImgurServerException(apiResponse);
-        }
-
-        return apiResponse;
+        return cl;
     }
 
     @Override

@@ -36,6 +36,7 @@ public class PersistingOAuthHandler extends AbstractAuthHandler {
         return data.getAccessToken();
     }
 
+    @Override
     public long getAccessTokenTimeout() {
         return data.getAccessTokenTimeout();
     }

@@ -16,6 +16,8 @@ import java.util.List;
 
 public class AuthEndpoint extends AbstractEndpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AuthEndpoint.class);
+
     public AuthEndpoint(Imgur imgur) {
         super(imgur);
     }
@@ -25,19 +27,21 @@ public class AuthEndpoint extends AbstractEndpoint {
         return "oauth2";
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuthEndpoint.class);
-
-    public void exchangePin(String pin, ImgurOAuthHandler ah) throws IOException, ApiRequestException {
-        final String url = endpointUrlWithSinglePathParameter("token");
-
+    private List<NameValuePair> authParams(String grantType, String name, String value) {
         final List<NameValuePair> params = new ArrayList<>();
 
         params.add(new BasicNameValuePair("client_id", getImgur().DATA.getClientId()));
         params.add(new BasicNameValuePair("client_secret", getImgur().DATA.getClientSecret()));
-        params.add(new BasicNameValuePair("grant_type", "pin"));
-        params.add(new BasicNameValuePair("pin", pin));
+        params.add(new BasicNameValuePair("grant_type", grantType));
+        params.add(new BasicNameValuePair(name, value));
 
-        final AuthResponse auth = getImgur().HTTP.initialAuth(url, params);
+        return params;
+    }
+
+    public void exchangePin(String pin, ImgurOAuthHandler ah) throws IOException, ApiRequestException {
+        final String url = endpointUrlWithSinglePathParameter("token");
+
+        final AuthResponse auth = getImgur().HTTP.initialAuth(url, authParams("pin", "pin", pin));
 
         LOG.debug("exchangePin: got auth response accessToken[" + auth.getAccessToken() + "] refreshToken[" + auth.getRefreshToken() + "] expiresIn[" + auth.getExpiresIn() + "]");
 
@@ -45,28 +49,14 @@ public class AuthEndpoint extends AbstractEndpoint {
     }
 
     public boolean exchangeCode(String code) throws IOException, ApiRequestException {
-        final ArrayList<NameValuePair> postParameters = new ArrayList<>();
-
-        postParameters.add(new BasicNameValuePair("client_id", getImgur().DATA.getClientId()));
-        postParameters.add(new BasicNameValuePair("client_secret", getImgur().DATA.getClientSecret()));
-        postParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        postParameters.add(new BasicNameValuePair("code", code));
-
-        return doToken(postParameters);
+        return doToken(authParams("authorization_code", "code", code));
     }
 
     public boolean refreshToken() throws IOException, ApiRequestException {
-        final ArrayList<NameValuePair> postParameters = new ArrayList<>();
-
-        postParameters.add(new BasicNameValuePair("client_id", getImgur().DATA.getClientId()));
-        postParameters.add(new BasicNameValuePair("client_secret", getImgur().DATA.getClientSecret()));
-        postParameters.add(new BasicNameValuePair("grant_type", "refresh_token"));
-        postParameters.add(new BasicNameValuePair("refresh_token", getImgur().AUTH_HANDLER.getRefreshToken()));
-
-        return doToken(postParameters);
+        return doToken(authParams("refresh_token", "refresh_token", getImgur().AUTH_HANDLER.getRefreshToken()));
     }
 
-    protected boolean doToken(ArrayList<NameValuePair> params) throws IOException, ApiRequestException {
+    protected boolean doToken(List<NameValuePair> params) throws IOException, ApiRequestException {
         final String refreshUrl = endpointUrlWithSinglePathParameter("token");
 
         final AuthResponse auth = getImgur().HTTP.auth(refreshUrl, params, true);

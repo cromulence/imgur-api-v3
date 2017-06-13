@@ -23,6 +23,7 @@ public class NotificationEndpoint extends AbstractEndpoint {
         super(imgur);
     }
 
+    @Override
     public String getEndpointName() {
         return ENDPOINT_NAME;
     }
@@ -38,25 +39,25 @@ public class NotificationEndpoint extends AbstractEndpoint {
     }
 
     public Notification getNotification(int id) throws ApiRequestException {
-        final String notificationsUrl = String.format("%s/%d", getEndpointUrl(), id);
+        final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
 
         return getImgur().HTTP.typedGet(notificationsUrl, Notification.class, true);
     }
 
     public Notification<Comment> getCommentNotification(int id) throws ApiRequestException {
-        final String notificationsUrl = String.format("%s/%d", getEndpointUrl(), id);
+        final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
         return getImgur().HTTP.typedGet(notificationsUrl, new TypeToken<Notification<Comment>>() {
         }, true);
     }
 
     public Notification<Conversation> getConversationNotification(int id) throws ApiRequestException {
-        final String notificationsUrl = String.format("%s/%d", getEndpointUrl(), id);
+        final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
         return getImgur().HTTP.typedGet(notificationsUrl, new TypeToken<Notification<Conversation>>() {
         }, true);
     }
 
     public void markRead(int id) throws ApiRequestException {
-        final String notificationsUrl = String.format("%s/%d", getEndpointUrl(), id);
+        final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
 
         getImgur().HTTP.typedPost(notificationsUrl, Boolean.class, true);
     }

@@ -20,7 +20,6 @@ public class ConversationsEndpoint extends AbstractEndpoint {
     }
 
     public Conversation getConversation(int conversationId) throws ApiRequestException {
-        //final String conversationUrl = String.format("%s/%d", getEndpointUrl(), conversationId);
         final String conversationUrl = endpointUrlWithSinglePathParameter(conversationId);
 
         return getImgur().HTTP.typedGet(conversationUrl, Conversation.class, true);

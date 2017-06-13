@@ -23,6 +23,7 @@ public class ImageEndpoint extends AbstractEndpoint {
         super(imgur);
     }
 
+    @Override
     public String getEndpointName() {
         return ENDPOINT_NAME;
     }

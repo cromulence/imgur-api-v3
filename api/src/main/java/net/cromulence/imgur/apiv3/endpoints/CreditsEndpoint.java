@@ -22,6 +22,7 @@ public class CreditsEndpoint extends AbstractEndpoint {
         super(imgur);
     }
 
+    @Override
     public String getEndpointName() {
         return ENDPOINT_NAME;
     }
@@ -43,9 +44,15 @@ public class CreditsEndpoint extends AbstractEndpoint {
         Integer remain = -1;
         Integer reset = -1;
 
-        if (limitHeader != null) limit = Integer.parseInt(limitHeader.getValue());
-        if (remainHeader != null) remain = Integer.parseInt(remainHeader.getValue());
-        if (resetHeader != null) reset = Integer.parseInt(resetHeader.getValue());
+        if (limitHeader != null) {
+            limit = Integer.parseInt(limitHeader.getValue());
+        }
+        if (remainHeader != null) {
+            remain = Integer.parseInt(remainHeader.getValue());
+        }
+        if (resetHeader != null) {
+            reset = Integer.parseInt(resetHeader.getValue());
+        }
 
         return new AppCredits(limit, remain, reset);
     }

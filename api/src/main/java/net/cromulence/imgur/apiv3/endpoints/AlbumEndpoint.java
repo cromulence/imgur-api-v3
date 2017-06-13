@@ -24,13 +24,13 @@ public class AlbumEndpoint extends AbstractEndpoint {
     }
 
     public Album getAlbum(String albumId) throws ApiRequestException {
-        String albumUrl = endpointUrlWithSinglePathParameter(albumId);
+        final String albumUrl = endpointUrlWithSinglePathParameter(albumId);
 
         return getImgur().HTTP.typedGet(albumUrl, Album.class);
     }
 
     public Image[] getImages(String albumId) throws ApiRequestException {
-        String albumUrl = endpointUrlWithMultiplePathParameters(albumId, "images");
+        final String albumUrl = endpointUrlWithMultiplePathParameters(albumId, "images");
 
         return getImgur().HTTP.typedGet(albumUrl, Image[].class);
     }
@@ -46,39 +46,53 @@ public class AlbumEndpoint extends AbstractEndpoint {
     }
 
     public void updateAlbum(String albumId, AlbumCreationDetails details) throws ApiRequestException {
-        String updateUrl = endpointUrlWithSinglePathParameter(albumId);
+        final String updateUrl = endpointUrlWithSinglePathParameter(albumId);
 
         getImgur().HTTP.post(updateUrl, details.getAsParams(), true);
     }
 
-//    TODO create anonymous
-//    TODO update anonymous
+    public AlbumIds createAnonymousAlbum(AlbumCreationDetails details) throws ApiRequestException {
+        return getImgur().HTTP.typedPost(getEndpointUrl(), AlbumIds.class, details.getAsParams(), false);
+    }
 
+    public void updateAnonymousAlbum(String albumId, AlbumCreationDetails details) throws ApiRequestException {
+        final String updateUrl = endpointUrlWithSinglePathParameter(albumId);
+
+        getImgur().HTTP.post(updateUrl, details.getAsParams(), false);
+    }
 
     public void deleteAlbum(String albumId) throws ApiRequestException {
-        String albumUrl = endpointUrlWithSinglePathParameter(albumId);
+        final String albumUrl = endpointUrlWithSinglePathParameter(albumId);
 
         getImgur().HTTP.delete(albumUrl);
     }
 
     public void favourite(String albumId) throws ApiRequestException {
-        String albumUrl = endpointUrlWithMultiplePathParameters(albumId, "favorite");
+        final String albumUrl = endpointUrlWithMultiplePathParameters(albumId, "favorite");
 
         getImgur().HTTP.post(albumUrl, true);
     }
 
-    public void setImages(String albumId, String[] imageIds) throws ApiRequestException {
-        String setUrl = endpointUrlWithSinglePathParameter(albumId);
+    public void setAlbumsImages(String albumId, String[] imageIds) throws ApiRequestException {
+        final String setUrl = endpointUrlWithSinglePathParameter(albumId);
 
         List<NameValuePair> params = getParamsFor("ids", Utils.asCommaSeparatedList(imageIds));
 
         getImgur().HTTP.post(setUrl, params, true);
     }
 
+    public void setAnonymousAlbumImages(String deleteHash, String[] imageDeleteHashes) throws ApiRequestException {
+        final String setUrl = endpointUrlWithSinglePathParameter(deleteHash);
+
+        List<NameValuePair> params = getParamsFor("ids", Utils.asCommaSeparatedList(imageDeleteHashes));
+
+        getImgur().HTTP.post(setUrl, params, false);
+    }
+
 //    TODO Set Album Images anonymous
 
     public void addImages(String albumId, String[] imageIds) throws ApiRequestException {
-        String addUrl = endpointUrlWithMultiplePathParameters(albumId, "add");
+        final String addUrl = endpointUrlWithMultiplePathParameters(albumId, "add");
 
         List<NameValuePair> params = getParamsFor("ids", Utils.asCommaSeparatedList(imageIds));
 
@@ -86,11 +100,17 @@ public class AlbumEndpoint extends AbstractEndpoint {
     }
 
     public void removeImages(String albumId, String[] imageIds) throws ApiRequestException {
-        String addUrl = endpointUrlWithMultiplePathParameters(albumId, "remove_images");
+        final String addUrl = endpointUrlWithMultiplePathParameters(albumId, "remove_images");
 
         List<NameValuePair> params = getParamsFor("ids", Utils.asCommaSeparatedList(imageIds));
 
         getImgur().HTTP.delete(addUrl, params, true);
+    }
+
+    public void deleteAnonymousAlbum(String deleteHash) throws ApiRequestException {
+        final String albumUrl = endpointUrlWithSinglePathParameter(deleteHash);
+
+        getImgur().HTTP.delete(albumUrl, false);
     }
 
 //    TODO Add Images to an Album anonymous

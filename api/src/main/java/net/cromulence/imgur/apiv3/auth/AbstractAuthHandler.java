@@ -6,7 +6,7 @@ public abstract class AbstractAuthHandler implements ImgurOAuthHandler {
     public boolean hasToken() {
         final String accessToken = getAccessToken();
 
-        return (accessToken != null && accessToken.length() > 0 && (getAccessTokenTimeout() != -1));
+        return accessToken != null && accessToken.length() > 0 && (getAccessTokenTimeout() != -1);
     }
 
     @Override
