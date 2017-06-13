@@ -27,6 +27,11 @@ public class AuthEndpoint extends AbstractEndpoint {
         return "oauth2";
     }
 
+    @Override
+    public String getEndpointUrl() {
+        return String.format("%s/%s", BASE_API_URL, getEndpointName());
+    }
+
     private List<NameValuePair> authParams(String grantType, String name, String value) {
         final List<NameValuePair> params = new ArrayList<>();
 

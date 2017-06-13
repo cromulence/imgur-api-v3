@@ -12,7 +12,10 @@ import java.util.List;
 
 public abstract class AbstractEndpoint {
 
-    private static final String BASE_V3_API_URL = "https://api.imgur.com/3";
+    protected static final String BASE_API_URL = "https://api.imgur.com";
+    private static final String API_VERSION = "3";
+
+    private static final String BASE_V3_API_URL = String.format("%s/%s", BASE_API_URL, API_VERSION);
 
     private final Imgur imgur;
 
