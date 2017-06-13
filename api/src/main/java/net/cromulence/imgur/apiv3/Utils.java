@@ -1,23 +1,30 @@
 package net.cromulence.imgur.apiv3;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 public class Utils {
 
     private static final long SECOND = 1000;
     private static final long MINUTE = 60 * SECOND;
     private static final long HOUR = 60 * MINUTE;
-    private static final long DAY = 24 * HOUR;
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DTF = new DateTimeFormatterBuilder()
+                .parseCaseInsensitive()
+                .append(ISO_LOCAL_DATE)
+                .appendLiteral(' ')
+                .append(ISO_LOCAL_TIME).toFormatter();
 
     private Utils() {}
 
     public static String formatHHMM(long interval) {
-        long milli = (interval - (0)) % Utils.SECOND;
+        long milli = interval % Utils.SECOND;
 
-        long sec = (interval - (milli)) % Utils.MINUTE;
+        long sec = (interval - milli) % Utils.MINUTE;
 
         long min = (interval - (milli + sec)) % Utils.HOUR;
 
@@ -26,8 +33,9 @@ public class Utils {
         return String.format("%dh%02dm", (hour / Utils.HOUR), (min / Utils.MINUTE));
     }
 
-    public static String formatUnixTime(long datetime) {
-        return SDF.format(new Date(datetime * 1000L));
+    public static synchronized String formatUnixTime(long datetime) {
+        Instant instant = Instant.ofEpochSecond(datetime);
+        return DTF.format(instant);
     }
 
     public static String formatUnixTime(String datetime) {
