@@ -60,55 +60,59 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
 
         Credits creds = new Credits();
 
-        // Check the response headers for the post limit count
-        Header postLimitHeader = response.getFirstHeader(HEADER_POST_LIMIT);
-        Header postRemainingHeader = response.getFirstHeader(HEADER_POST_REMAINING);
-        Header postResetHeader = response.getFirstHeader(HEADER_POST_RESET);
+        {
+            // Check the response headers for the post limit count
+            Header postLimitHeader = response.getFirstHeader(HEADER_POST_LIMIT);
+            Header postRemainingHeader = response.getFirstHeader(HEADER_POST_REMAINING);
+            Header postResetHeader = response.getFirstHeader(HEADER_POST_RESET);
 
-        if(req.getMethod().equalsIgnoreCase("POST")) {
-            if (postLimitHeader == null || postRemainingHeader == null || postResetHeader == null) {
-                LOG.info("App post rate limit headers not available on endpoint {}", req.getURI());
-            } else {
+            if (req.getMethod().equalsIgnoreCase("POST")) {
+                if (postLimitHeader == null || postRemainingHeader == null || postResetHeader == null) {
+                    LOG.info("App post rate limit headers not available on endpoint {}", req.getURI());
+                } else {
 
-                Integer postLimit = Integer.parseInt(postLimitHeader.getValue());
-                Integer postRemain = Integer.parseInt(postRemainingHeader.getValue());
-                String postReset = postResetHeader.getValue();
+                    Integer postLimit = Integer.parseInt(postLimitHeader.getValue());
+                    Integer postRemain = Integer.parseInt(postRemainingHeader.getValue());
+                    String postReset = postResetHeader.getValue();
 
-                logLimit("Post", postLimit, postRemain, postReset);
+                    logLimit("Post", postLimit, postRemain, postReset);
 
-                creds.setPostLimit(postLimit);
-                creds.setPostRemaining(postRemain);
-                creds.setPostReset(Long.parseLong(postReset));
+                    creds.setPostLimit(postLimit);
+                    creds.setPostRemaining(postRemain);
+                    creds.setPostReset(Long.parseLong(postReset));
+                }
             }
         }
 
-        Header clientLimitHeader  = response.getFirstHeader(HEADER_CLIENT_LIMIT);
-        Header clientRemainHeader = response.getFirstHeader(HEADER_CLIENT_REMAINING);
-        Header userLimitHeader    = response.getFirstHeader(HEADER_USER_LIMIT);
-        Header userRemainHeader   = response.getFirstHeader(HEADER_USER_REMAINING);
-        Header userResetHeader    = response.getFirstHeader(HEADER_USER_RESET);
+        {
+            Header clientLimitHeader = response.getFirstHeader(HEADER_CLIENT_LIMIT);
+            Header clientRemainHeader = response.getFirstHeader(HEADER_CLIENT_REMAINING);
+            Header userLimitHeader = response.getFirstHeader(HEADER_USER_LIMIT);
+            Header userRemainHeader = response.getFirstHeader(HEADER_USER_REMAINING);
+            Header userResetHeader = response.getFirstHeader(HEADER_USER_RESET);
 
-        if (clientLimitHeader == null || clientRemainHeader == null || userLimitHeader == null || userRemainHeader == null || userResetHeader == null) {
-            LOG.info("Client and user rate limit headers not available for endpoint {}", req.getURI());
-        } else {
-            Integer clientLimit = Integer.parseInt(postLimitHeader.getValue());
-            Integer clientRemain = Integer.parseInt(postRemainingHeader.getValue());
-            String clientReset = "?";
+            if (clientLimitHeader == null || clientRemainHeader == null || userLimitHeader == null || userRemainHeader == null || userResetHeader == null) {
+                LOG.info("Client and user rate limit headers not available for endpoint {}", req.getURI());
+            } else {
+                Integer clientLimit = Integer.parseInt(clientLimitHeader.getValue());
+                Integer clientRemain = Integer.parseInt(clientRemainHeader.getValue());
+                String clientReset = "?";
 
-            logLimit("Client", clientLimit, clientRemain, clientReset);
+                logLimit("Client", clientLimit, clientRemain, clientReset);
 
-            creds.setClientLimit(clientLimit);
-            creds.setClientRemaining(clientRemain);
+                creds.setClientLimit(clientLimit);
+                creds.setClientRemaining(clientRemain);
 
-            Integer userLimit = Integer.parseInt(postLimitHeader.getValue());
-            Integer userRemain = Integer.parseInt(postRemainingHeader.getValue());
-            String userReset = postResetHeader.getValue();
+                Integer userLimit = Integer.parseInt(userLimitHeader.getValue());
+                Integer userRemain = Integer.parseInt(userRemainHeader.getValue());
+                String userReset = userResetHeader.getValue();
 
-            logLimit("User", userLimit, userRemain, userReset);
+                logLimit("User", userLimit, userRemain, userReset);
 
-            creds.setUserLimit(userLimit);
-            creds.setUserRemaining(userRemain);
-            creds.setUserReset(Long.parseLong(userReset));
+                creds.setUserLimit(userLimit);
+                creds.setUserRemaining(userRemain);
+                creds.setUserReset(Long.parseLong(userReset));
+            }
         }
 
         imgur.CREDITS.setCreditsFromResponse(creds);
