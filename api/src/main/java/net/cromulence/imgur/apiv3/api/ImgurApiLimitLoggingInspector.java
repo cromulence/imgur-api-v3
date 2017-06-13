@@ -51,13 +51,6 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
             return;
         }
 
-        // TODO
-        // X-RateLimit-ClientLimit,
-        // X-RateLimit-ClientRemaining,
-        // X-RateLimit-UserLimit,
-        // X-RateLimit-UserRemaining,
-        // X-RateLimit-UserReset
-
         Credits creds = new Credits();
 
         {

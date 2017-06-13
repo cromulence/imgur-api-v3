@@ -29,9 +29,4 @@ public abstract class ImageUploadDetails implements ParameterObject<ImageUploadD
     public abstract String getImageData() throws ApiRequestException;
 
     public abstract String getUploadType();
-
-//    @Override
-//    public ImageUploadDetailsBuilder getBuilder() {
-//        return new ImageUploadDetailsBuilder();
-//    }
 }
