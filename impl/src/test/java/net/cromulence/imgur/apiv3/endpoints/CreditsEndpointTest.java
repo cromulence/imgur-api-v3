@@ -23,8 +23,8 @@ public class CreditsEndpointTest extends ImgurEndpointTest {
         assertEquals("credits should be free", userOneInitialCredits.getUserRemaining(), userOneBeforeGetImageCredits.getUserRemaining());
 
         Paginated<GalleryEntry[]> gallery = getUser1ImgurUnderTest().GALLERY.gallery();
-        gallery.next();
-        gallery.next();
+        GalleryEntry[] one = gallery.next();
+        GalleryEntry[] two = gallery.next();
 
         Credits userOneAfterGetImageCredits = getUser1ImgurUnderTest().CREDITS.getCredits();
         Credits userTwoAfterGetImageCredits = getUser2ImgurUnderTest().CREDITS.getCredits();

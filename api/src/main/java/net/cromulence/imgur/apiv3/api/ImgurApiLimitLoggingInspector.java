@@ -108,12 +108,12 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
             }
         }
 
-        imgur.CREDITS.setCreditsFromResponse(creds);
+        imgur.CREDITS.update(creds);
     }
 
     private void logLimit(String type, int limit, int remain, String reset) {
         if (remain == 0) {
-            // We done fucked up bad
+            // Completely exhausted the allowance
             LOG.error("API {} Limit reached, resets on {}", type, reset);
         } else if ((limit * FRACTION) < remain) {
             // things are getting ropey

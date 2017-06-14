@@ -20,29 +20,33 @@ public class CreditsEndpoint extends AbstractEndpoint {
     }
 
     public Credits getCredits() throws ApiRequestException {
-        return getCredits(false);
-    }
 
-    public Credits getCredits(boolean forceServerRequest) throws ApiRequestException {
+        // TODO explain why credits are a mess
 
-        if(forceServerRequest || credits == null) {
-            final Credits newCredits = getImgur().HTTP.typedGet(getEndpointUrl(), Credits.class, true);
+        final Credits newCredits = getImgur().HTTP.typedGet(getEndpointUrl(), Credits.class, true);
 
-            if(credits == null) {
-                credits = newCredits;
-            } else {
-                credits.setUserLimit(newCredits.getUserLimit());
-                credits.setUserRemaining(newCredits.getUserRemaining());
-                credits.setUserReset(newCredits.getUserReset());
-                credits.setClientLimit(newCredits.getClientLimit());
-                credits.setClientRemaining(newCredits.getClientRemaining());
-            }
+        if(credits == null) {
+            credits = newCredits;
+        } else {
+            update(newCredits);
         }
 
         return credits;
     }
 
-    public void setCreditsFromResponse(Credits newCredits) {
-        credits = newCredits;
+    public void update(Credits newCredits) {
+
+        // If the response has all of the data, just use it
+        if(newCredits.isFullyPopulated()) {
+            credits = newCredits;
+        }
+
+        // If it is a partial update, we need to ensure we have something for it to update
+        if (credits != null) {
+            newCredits.mergeIn(credits);
+            credits = newCredits;
+        }
+
+        // else ignore it. getCredits will have to go to the API
     }
 }
