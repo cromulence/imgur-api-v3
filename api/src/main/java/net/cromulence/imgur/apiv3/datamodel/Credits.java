@@ -54,7 +54,7 @@ public class Credits implements Serializable {
     }
 
     public void setUserLimit(int userLimit) {
-        userLimit = userLimit;
+        this.userLimit = userLimit;
     }
 
     public int getUserRemaining() {
@@ -62,7 +62,7 @@ public class Credits implements Serializable {
     }
 
     public void setUserRemaining(int userRemaining) {
-        userRemaining = userRemaining;
+        this.userRemaining = userRemaining;
     }
 
     public long getUserReset() {
@@ -70,7 +70,7 @@ public class Credits implements Serializable {
     }
 
     public void setUserReset(long userReset) {
-        userReset = userReset;
+        this.userReset = userReset;
     }
 
     public int getClientLimit() {
@@ -78,7 +78,7 @@ public class Credits implements Serializable {
     }
 
     public void setClientLimit(int clientLimit) {
-        clientLimit = clientLimit;
+        this.clientLimit = clientLimit;
     }
 
     public int getClientRemaining() {
@@ -86,7 +86,7 @@ public class Credits implements Serializable {
     }
 
     public void setClientRemaining(int clientRemaining) {
-        clientRemaining = clientRemaining;
+        this.clientRemaining = clientRemaining;
     }
 
     // {"data":{"UserLimit":500,"UserRemaining":500,"UserReset":1464006639,"ClientLimit":12500,"ClientRemaining":12500},"success":true,"status":200}

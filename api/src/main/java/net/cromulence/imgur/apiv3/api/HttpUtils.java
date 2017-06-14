@@ -554,16 +554,12 @@ public class HttpUtils implements HttpInspector {
                         // Noop
                     }
                 }
-
-                continue;
             }
         }
 
-        if (lastThrowable != null) {
-            throw new ApiRequestException("Retries failed, rethrowing last exception", lastThrowable);
-        }
-
-        return null;
+        // If we get here, we have not returned following a successful response.
+        // Throw the most recent exception
+        throw new ApiRequestException("Retries failed, rethrowing last exception", lastThrowable);
     }
 
     private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ImgurRequestException, ImgurServerException, ApiRequestException {
