@@ -9,9 +9,11 @@ buildscript {
     }
     dependencies {
         classpath "net.cromulence.buildsystem.gradle:travis-bintray:+"
+        classpath 'com.palantir:jacoco-coverage:0.4.0'
     }
 }
 
+apply plugin: 'com.palantir.jacoco-full-report'
 apply from: 'dependencies.gradle'
 
 allprojects {
