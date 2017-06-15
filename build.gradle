@@ -50,7 +50,7 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    apply plugin: 'jacoco'
+//    apply plugin: 'jacoco'
 
     project.version = rootProject.version
 
@@ -104,7 +104,7 @@ subprojects {
 }
 
 task codeCoverageReport(type: JacocoReport) {
-  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+  executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
   subprojects.each {
     sourceSets it.sourceSets.main
