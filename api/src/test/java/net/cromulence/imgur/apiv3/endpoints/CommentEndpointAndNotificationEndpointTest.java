@@ -35,7 +35,7 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
         }
     }
 
-    @Test
+    //@Test
     public void testNotifications() throws Exception {
 
         {

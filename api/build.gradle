@@ -4,4 +4,11 @@ dependencies {
     compile libs.gson
     compile libs.guava
     compile libs.httpclient
+
+    testCompile project(':impl')
+
+    testCompile libs.datawrapperProperties
+
+    testCompile libs.slf4jSimple
+    testCompile libs.junit
 }
