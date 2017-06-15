@@ -65,5 +65,6 @@ public class Imgur {
         IMAGE   = new ImageEndpoint(this);
         NOTIFICATION = new NotificationEndpoint(this);
         TOPIC = new TopicEndpoint(this);
+
     }
 }

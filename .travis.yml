@@ -37,4 +37,4 @@ deploy:
   dry-run: false
 after_success:
 - aws --debug --region=eu-west-2 s3 cp ~/test.properties s3://cromulence.travis.imgur-api-v3/test.properties
-- bash <(curl -s https://codecov.io/bash)"
+- bash <(curl -s https://codecov.io/bash)
