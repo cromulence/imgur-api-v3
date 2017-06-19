@@ -95,179 +95,15 @@ public class HttpUtils implements HttpInspector {
     // Request / respsonse interceptors
     private final List<HttpInspector> httpInspectors = new ArrayList<>();
 
-    /*
-     * This is the section of JSON shame. All of the bodges required to get the
-     * right objects from the JSON we get out of the API. Field type overloading
-     * is mostly to blame, and trying to solve it with inheritance
-     */
-
+    // Custom JSON deserializers
     private final JsonDeserializer imageDeserializer = new ImageDeserializer();
-
-    private class ImageDeserializer implements JsonDeserializer<Image> {
-
-        @Override
-        public Image deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-            return simpleGson.fromJson(json, ImageImpl.class);
-        }
-    }
-
     private final JsonDeserializer albumDeserializer = new AlbumDeserializer();
-
-    private class AlbumDeserializer implements JsonDeserializer<Album> {
-        private static final String IMAGES = "images";
-
-        @Override
-        public Album deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-
-            Image[] images = new Image[0];
-
-            if (json.getAsJsonObject().has(IMAGES)) {
-                JsonArray imagesJson = json.getAsJsonObject().get(IMAGES).getAsJsonArray();
-                json.getAsJsonObject().remove(IMAGES);
-
-                images = new Image[imagesJson.size()];
-
-                for (int i = 0; i < imagesJson.size(); i++) {
-                    images[i] = context.deserialize(imagesJson.get(i), ImageImpl.class);
-                }
-            }
-
-            final AlbumImpl album = simpleGson.fromJson(json, AlbumImpl.class);
-            album.setImages(images);
-
-            return album;
-        }
-    }
-
     private final JsonDeserializer galleryDeserializer = new GalleryDeserializer();
-
-    private class GalleryDeserializer implements JsonDeserializer<GalleryDetails> {
-        @Override
-        public GalleryDetails deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-            return simpleGson.fromJson(json, GalleryDetailsImpl.class);
-        }
-    }
-
     private final JsonDeserializer galleryEntryDeserializer = new GalleryEntryDeserializer();
-
-    private class GalleryEntryDeserializer implements JsonDeserializer<GalleryEntry> {
-
-        @Override
-        public GalleryEntry deserialize(JsonElement json,
-            Type typeOfT, JsonDeserializationContext context) {
-
-            GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
-
-            boolean is_album = json.getAsJsonObject().get("is_album").getAsBoolean();
-
-            if (is_album) {
-                Album a = context.deserialize(json, AlbumImpl.class);
-                return new GalleryAlbumImpl(a, gd);
-            } else {
-                Image i = context.deserialize(json, ImageImpl.class);
-                return new GalleryImageImpl(i, gd);
-            }
-        }
-    }
-
     private final JsonDeserializer notifiableDeserializer = new NotifiableDeserializer();
-
-    private class NotifiableDeserializer implements JsonDeserializer<Notifiable> {
-        @Override
-        public Notifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-
-            if (json.getAsJsonObject().has("comment")) {
-                return simpleGson.fromJson(json, Comment.class);
-            } else if (json.getAsJsonObject().has("with_account_id")) {
-                return simpleGson.fromJson(json, Conversation.class);
-            }
-
-            throw new JsonParseException("Unknown notification type");
-        }
-    };
-
-    private final JsonDeserializer<ApiError> apiErrorJsonDeserializer = new ApiErrorJsonDeserializer() ;
-
-    private class ApiErrorJsonDeserializer implements JsonDeserializer<ApiError> {
-
-        private static final String ERROR = "error";
-
-        @Override
-        public ApiError deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-
-            JsonObject jo = json.getAsJsonObject();
-            if (jo.has(ERROR)) {
-                if (jo.get(ERROR).isJsonObject()) {
-                    return simpleGson.fromJson(json, typeOfT);
-                } else {
-                    // It's a string, not an object. Fake out an object based on it
-                    ApiError e = simpleGson.fromJson(json, typeOfT);
-
-                    ErrorDetails ed = new ErrorDetails();
-                    ed.setMessage(jo.remove(ERROR).getAsString());
-                    ed.setCode(-1);
-                    ed.setType("ConvertedSimpleError");
-
-                    e.setErrorDetails(ed);
-
-                    return e;
-                }
-            } else {
-                return simpleGson.fromJson(json, typeOfT);
-            }
-        }
-    }
-
-    private final JsonDeserializer<Comment[]> commentArrayJsonDeserializer = new CommentArrayJsonDeserializer();
-
-    private class CommentArrayJsonDeserializer implements JsonDeserializer<Comment[]> {
-        @Override
-        public Comment[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-
-            if (json.isJsonArray()) {
-                return simpleGson.fromJson(json, Comment[].class);
-            } else {
-                // Single comments dont come back in an array
-                return new Comment[] {simpleGson.fromJson(json, Comment.class)};
-            }
-        }
-    }
-
-    private final JsonDeserializer<String[]> stringArrayJsonDeserializer = new StringArrayJsonDeserializer();
-
-    private class StringArrayJsonDeserializer implements JsonDeserializer<String[]> {
-        @Override
-        public String[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
-
-            List<String> toReturn = new ArrayList<>();
-
-            if (!json.isJsonArray()) {
-                return new String[0];
-            }
-
-            final JsonArray ja = json.getAsJsonArray();
-
-            for (int i = 0; i < ja.size(); i++) {
-                JsonElement jsonElement = ja.get(i);
-
-                if (jsonElement.isJsonPrimitive()) {
-                    JsonPrimitive asJsonPrimitive = jsonElement.getAsJsonPrimitive();
-
-                    if (asJsonPrimitive.isNumber()) {
-                        toReturn.add(Long.toString(asJsonPrimitive.getAsNumber().longValue()));
-                    } else {
-                        toReturn.add(asJsonPrimitive.toString());
-                    }
-                }
-            }
-
-            return toReturn.toArray(new String[toReturn.size()]);
-        }
-    };
-
-    /*
-     * Here ends JSON shame. Regular shame resumes.
-     */
+    private final JsonDeserializer apiErrorJsonDeserializer = new ApiErrorJsonDeserializer();
+    private final JsonDeserializer commentArrayJsonDeserializer = new CommentArrayJsonDeserializer();
+    private final JsonDeserializer stringArrayJsonDeserializer = new StringArrayJsonDeserializer();
 
     HttpUtils(Imgur imgur) {
         this(imgur, HttpClients.createDefault());
@@ -751,4 +587,162 @@ public class HttpUtils implements HttpInspector {
             }
         }
     }
+
+        /*
+     * This is the section of JSON shame. All of the bodges required to get the
+     * right objects from the JSON we get out of the API. Field type overloading
+     * is mostly to blame, and trying to solve it with inheritance
+     */
+
+    private class ImageDeserializer implements JsonDeserializer<Image> {
+
+        @Override
+        public Image deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+            return simpleGson.fromJson(json, ImageImpl.class);
+        }
+    }
+
+    private class AlbumDeserializer implements JsonDeserializer<Album> {
+        private static final String IMAGES = "images";
+
+        @Override
+        public Album deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+
+            Image[] images = new Image[0];
+
+            if (json.getAsJsonObject().has(IMAGES)) {
+                JsonArray imagesJson = json.getAsJsonObject().get(IMAGES).getAsJsonArray();
+                json.getAsJsonObject().remove(IMAGES);
+
+                images = new Image[imagesJson.size()];
+
+                for (int i = 0; i < imagesJson.size(); i++) {
+                    images[i] = context.deserialize(imagesJson.get(i), ImageImpl.class);
+                }
+            }
+
+            final AlbumImpl album = simpleGson.fromJson(json, AlbumImpl.class);
+            album.setImages(images);
+
+            return album;
+        }
+    }
+
+    private class GalleryDeserializer implements JsonDeserializer<GalleryDetails> {
+        @Override
+        public GalleryDetails deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+            return simpleGson.fromJson(json, GalleryDetailsImpl.class);
+        }
+    }
+
+    private class GalleryEntryDeserializer implements JsonDeserializer<GalleryEntry> {
+
+        @Override
+        public GalleryEntry deserialize(JsonElement json,
+            Type typeOfT, JsonDeserializationContext context) {
+
+            GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
+
+            boolean is_album = json.getAsJsonObject().get("is_album").getAsBoolean();
+
+            if (is_album) {
+                Album a = context.deserialize(json, AlbumImpl.class);
+                return new GalleryAlbumImpl(a, gd);
+            } else {
+                Image i = context.deserialize(json, ImageImpl.class);
+                return new GalleryImageImpl(i, gd);
+            }
+        }
+    }
+
+    private class NotifiableDeserializer implements JsonDeserializer<Notifiable> {
+        @Override
+        public Notifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+
+            if (json.getAsJsonObject().has("comment")) {
+                return simpleGson.fromJson(json, Comment.class);
+            } else if (json.getAsJsonObject().has("with_account_id")) {
+                return simpleGson.fromJson(json, Conversation.class);
+            }
+
+            throw new JsonParseException("Unknown notification type");
+        }
+    };
+
+    private class ApiErrorJsonDeserializer implements JsonDeserializer<ApiError> {
+
+        private static final String ERROR = "error";
+
+        @Override
+        public ApiError deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+
+            JsonObject jo = json.getAsJsonObject();
+            if (jo.has(ERROR)) {
+                if (jo.get(ERROR).isJsonObject()) {
+                    return simpleGson.fromJson(json, typeOfT);
+                } else {
+                    // It's a string, not an object. Fake out an object based on it
+                    ApiError e = simpleGson.fromJson(json, typeOfT);
+
+                    ErrorDetails ed = new ErrorDetails();
+                    ed.setMessage(jo.remove(ERROR).getAsString());
+                    ed.setCode(-1);
+                    ed.setType("ConvertedSimpleError");
+
+                    e.setErrorDetails(ed);
+
+                    return e;
+                }
+            } else {
+                return simpleGson.fromJson(json, typeOfT);
+            }
+        }
+    }
+
+    private class CommentArrayJsonDeserializer implements JsonDeserializer<Comment[]> {
+        @Override
+        public Comment[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+
+            if (json.isJsonArray()) {
+                return simpleGson.fromJson(json, Comment[].class);
+            } else {
+                // Single comments dont come back in an array
+                return new Comment[] {simpleGson.fromJson(json, Comment.class)};
+            }
+        }
+    }
+
+    private class StringArrayJsonDeserializer implements JsonDeserializer<String[]> {
+        @Override
+        public String[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+
+            List<String> toReturn = new ArrayList<>();
+
+            if (!json.isJsonArray()) {
+                return new String[0];
+            }
+
+            final JsonArray ja = json.getAsJsonArray();
+
+            for (int i = 0; i < ja.size(); i++) {
+                JsonElement jsonElement = ja.get(i);
+
+                if (jsonElement.isJsonPrimitive()) {
+                    JsonPrimitive asJsonPrimitive = jsonElement.getAsJsonPrimitive();
+
+                    if (asJsonPrimitive.isNumber()) {
+                        toReturn.add(Long.toString(asJsonPrimitive.getAsNumber().longValue()));
+                    } else {
+                        toReturn.add(asJsonPrimitive.toString());
+                    }
+                }
+            }
+
+            return toReturn.toArray(new String[toReturn.size()]);
+        }
+    };
+
+    /*
+     * Here ends JSON shame. Regular shame resumes.
+     */
 }
