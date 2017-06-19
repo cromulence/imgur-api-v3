@@ -5,6 +5,7 @@ before_install:
 - pip install --user awscli
 - aws --debug --region=eu-west-2 s3 cp s3://cromulence.travis.imgur-api-v3/test.properties
   ~/test.properties
+- mkdir /home/travis/zippedBuild
 addons:
   sonarqube:
     organization: cromulence
@@ -13,11 +14,14 @@ addons:
 script:
 - "./gradlew --stacktrace clean check sourceJar javadocJar jacocoFullReport generatePomFileForMavenPublication copyBintrayTemplate"
 - sonar-scanner
+before_deploy:
+zip ./* /home/travis/zippedBuild/${TRAVIS_BUILD_NUMBER}.zip
 deploy:
 - provider: s3
   on:
     all_branches: true
   upload-dir: output
+  local_dir: /home/travis/zippedBuild
   bucket: cromulence.travis.imgur-api-v3
   region: eu-west-2
   skip_cleanup: true
