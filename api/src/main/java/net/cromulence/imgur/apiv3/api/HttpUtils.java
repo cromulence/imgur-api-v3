@@ -428,6 +428,11 @@ public class HttpUtils implements HttpInspector {
                     throw new ApiRequestException("Unknown http error status received: " + response.getStatus());
             }
         } else {
+            if ("User Previously Verified".equals(error.getErrorDetails().getMessage())) {
+                // No exception needed here
+                return;
+            }
+
             switch (error.getErrorDetails().getCode()) {
                 case 1002: // File is over the size limit
                     throw new UploadTooLargeException();
