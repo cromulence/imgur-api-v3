@@ -6,10 +6,9 @@ public enum GallerySort {
     TIME,
     RISING;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
 
     }
-
-    ;
 }

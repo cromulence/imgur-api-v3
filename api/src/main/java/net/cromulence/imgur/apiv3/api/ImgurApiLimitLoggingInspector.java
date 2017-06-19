@@ -13,20 +13,24 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
 
     private static final Logger LOG = LoggerFactory.getLogger(ImgurApiLimitLoggingInspector.class);
 
+    private static final String SUFFIX_LIMIT = "Limit";
+    private static final String SUFFIX_REMAINING = "Remaining";
+    private static final String SUFFIX_RESET = "Reset";
+
     private static final String POST_PREFIX = "X-Post-Rate-Limit-";
     private static final String CLIENT_PREFIX = "X-RateLimit-Client";
     private static final String USER_PREFIX = "X-RateLimit-User";
 
-    private static final String HEADER_POST_LIMIT = POST_PREFIX + "Limit";
-    private static final String HEADER_POST_REMAINING = POST_PREFIX + "Remaining";
-    private static final String HEADER_POST_RESET = POST_PREFIX + "Reset";
+    private static final String HEADER_POST_LIMIT = POST_PREFIX + SUFFIX_LIMIT;
+    private static final String HEADER_POST_REMAINING = POST_PREFIX + SUFFIX_REMAINING;
+    private static final String HEADER_POST_RESET = POST_PREFIX + SUFFIX_RESET;
 
-    private static final String HEADER_CLIENT_LIMIT = CLIENT_PREFIX + "Limit";
-    private static final String HEADER_CLIENT_REMAINING = CLIENT_PREFIX + "Remaining";
+    private static final String HEADER_CLIENT_LIMIT = CLIENT_PREFIX + SUFFIX_LIMIT;
+    private static final String HEADER_CLIENT_REMAINING = CLIENT_PREFIX + SUFFIX_REMAINING;
 
-    private static final String HEADER_USER_LIMIT = USER_PREFIX + "Limit";
-    private static final String HEADER_USER_REMAINING = USER_PREFIX + "Remaining";
-    private static final String HEADER_USER_RESET = USER_PREFIX + "Reset";
+    private static final String HEADER_USER_LIMIT = USER_PREFIX + SUFFIX_LIMIT;
+    private static final String HEADER_USER_REMAINING = USER_PREFIX + SUFFIX_REMAINING;
+    private static final String HEADER_USER_RESET = USER_PREFIX + SUFFIX_RESET;
 
     /** Fraction at which warnings start */
     private static final int FRACTION = 10;
@@ -53,62 +57,75 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
 
         Credits creds = new Credits();
 
-        {
-            // Check the response headers for the post limit count
-            Header postLimitHeader = response.getFirstHeader(HEADER_POST_LIMIT);
-            Header postRemainingHeader = response.getFirstHeader(HEADER_POST_REMAINING);
-            Header postResetHeader = response.getFirstHeader(HEADER_POST_RESET);
-
-            if (req.getMethod().equalsIgnoreCase("POST")) {
-                if (postLimitHeader == null || postRemainingHeader == null || postResetHeader == null) {
-                    LOG.info("App post rate limit headers not available on endpoint {}", req.getURI());
-                } else {
-
-                    Integer postLimit = Integer.parseInt(postLimitHeader.getValue());
-                    Integer postRemain = Integer.parseInt(postRemainingHeader.getValue());
-                    String postReset = postResetHeader.getValue();
-
-                    logLimit("Post", postLimit, postRemain, postReset);
-
-                    creds.setPostLimit(postLimit);
-                    creds.setPostRemaining(postRemain);
-                    creds.setPostReset(Long.parseLong(postReset));
-                }
-            }
-        }
-
-        {
-            Header clientLimitHeader = response.getFirstHeader(HEADER_CLIENT_LIMIT);
-            Header clientRemainHeader = response.getFirstHeader(HEADER_CLIENT_REMAINING);
-            Header userLimitHeader = response.getFirstHeader(HEADER_USER_LIMIT);
-            Header userRemainHeader = response.getFirstHeader(HEADER_USER_REMAINING);
-            Header userResetHeader = response.getFirstHeader(HEADER_USER_RESET);
-
-            if (clientLimitHeader == null || clientRemainHeader == null || userLimitHeader == null || userRemainHeader == null || userResetHeader == null) {
-                LOG.info("Client and user rate limit headers not available for endpoint {}", req.getURI());
-            } else {
-                Integer clientLimit = Integer.parseInt(clientLimitHeader.getValue());
-                Integer clientRemain = Integer.parseInt(clientRemainHeader.getValue());
-                String clientReset = "?";
-
-                logLimit("Client", clientLimit, clientRemain, clientReset);
-
-                creds.setClientLimit(clientLimit);
-                creds.setClientRemaining(clientRemain);
-
-                Integer userLimit = Integer.parseInt(userLimitHeader.getValue());
-                Integer userRemain = Integer.parseInt(userRemainHeader.getValue());
-                String userReset = userResetHeader.getValue();
-
-                logLimit("User", userLimit, userRemain, userReset);
-
-                creds.setUserLimit(userLimit);
-                creds.setUserRemaining(userRemain);
-                creds.setUserReset(Long.parseLong(userReset));
-            }
-        }
+        setPostLimitValues(req, response, creds);
+        setClientLimitValues(req, response, creds);
+        setUserLimitValues(req, response, creds);
 
         imgur.credits.update(creds);
+    }
+
+    private void setUserLimitValues(HttpRequestBase req, HttpResponse response, Credits creds) {
+        Header userLimitHeader = response.getFirstHeader(HEADER_USER_LIMIT);
+        Header userRemainHeader = response.getFirstHeader(HEADER_USER_REMAINING);
+        Header userResetHeader = response.getFirstHeader(HEADER_USER_RESET);
+
+        if (userLimitHeader == null || userRemainHeader == null || userResetHeader == null) {
+            LOG.info("User rate limit headers not available for endpoint {}", req.getURI());
+        } else {
+            Integer userLimit = Integer.parseInt(userLimitHeader.getValue());
+            Integer userRemain = Integer.parseInt(userRemainHeader.getValue());
+            String userReset = userResetHeader.getValue();
+
+            logLimit("User", userLimit, userRemain, userReset);
+
+            creds.setUserLimit(userLimit);
+            creds.setUserRemaining(userRemain);
+            creds.setUserReset(Long.parseLong(userReset));
+        }
+    }
+
+    private void setClientLimitValues(HttpRequestBase req, HttpResponse response, Credits creds) {
+
+        Header clientLimitHeader = response.getFirstHeader(HEADER_CLIENT_LIMIT);
+        Header clientRemainHeader = response.getFirstHeader(HEADER_CLIENT_REMAINING);
+
+        if (clientLimitHeader == null || clientRemainHeader == null) {
+            LOG.info("Client rate limit headers not available for endpoint {}", req.getURI());
+        } else {
+            Integer clientLimit = Integer.parseInt(clientLimitHeader.getValue());
+            Integer clientRemain = Integer.parseInt(clientRemainHeader.getValue());
+            String clientReset = "?";
+
+            logLimit("Client", clientLimit, clientRemain, clientReset);
+
+            creds.setClientLimit(clientLimit);
+            creds.setClientRemaining(clientRemain);
+        }
+
+    }
+
+    private void setPostLimitValues(HttpRequestBase req, HttpResponse response, Credits creds) {
+        // Check the response headers for the post limit count
+        Header postLimitHeader = response.getFirstHeader(HEADER_POST_LIMIT);
+        Header postRemainingHeader = response.getFirstHeader(HEADER_POST_REMAINING);
+        Header postResetHeader = response.getFirstHeader(HEADER_POST_RESET);
+
+        if (req.getMethod().equalsIgnoreCase("POST")) {
+            if (postLimitHeader == null || postRemainingHeader == null || postResetHeader == null) {
+                LOG.info("App post rate limit headers not available on endpoint {}", req.getURI());
+            } else {
+
+                Integer postLimit = Integer.parseInt(postLimitHeader.getValue());
+                Integer postRemain = Integer.parseInt(postRemainingHeader.getValue());
+                String postReset = postResetHeader.getValue();
+
+                logLimit("Post", postLimit, postRemain, postReset);
+
+                creds.setPostLimit(postLimit);
+                creds.setPostRemaining(postRemain);
+                creds.setPostReset(Long.parseLong(postReset));
+            }
+        }
     }
 
     private void logLimit(String type, int limit, int remain, String reset) {

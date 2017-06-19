@@ -35,7 +35,7 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
 
             AlbumCreationDetailsBuilder b = new AlbumCreationDetailsBuilder();
 
-            b.coverId(id2).title("album title").description("album description").privacy(AlbumPrivacy.HIDDEN).layout(AlbumLayout.grid).imageIds(new String[] {id1, id2, id3});
+            b.coverId(id2).title("album title").description("album description").privacy(AlbumPrivacy.HIDDEN).layout(AlbumLayout.GRID).imageIds(new String[] {id1, id2, id3});
 
             // publish the album
             albumIds = getUser1ImgurUnderTest().album.createAlbum(b.build());

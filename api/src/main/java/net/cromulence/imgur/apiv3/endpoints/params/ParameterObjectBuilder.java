@@ -1,5 +1,6 @@
 package net.cromulence.imgur.apiv3.endpoints.params;
 
-public interface ParameterObjectBuilder<PO extends ParameterObject> {
-    PO build();
+@FunctionalInterface
+public interface ParameterObjectBuilder<P extends ParameterObject> {
+    P build();
 }

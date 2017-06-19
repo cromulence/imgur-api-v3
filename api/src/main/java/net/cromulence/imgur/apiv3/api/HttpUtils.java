@@ -399,7 +399,8 @@ public class HttpUtils implements HttpInspector {
                     try {
                         Thread.sleep(2500L);
                     } catch (InterruptedException ie) {
-                        throw new IllegalStateException("Nothing should be interrupting thread's sleep", e);
+                        // Do nothing
+                        Thread.currentThread().interrupt();
                     }
                 }
             }

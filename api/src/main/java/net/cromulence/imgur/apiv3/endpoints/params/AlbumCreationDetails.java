@@ -57,9 +57,4 @@ public class AlbumCreationDetails implements ParameterObject<AlbumCreationDetail
 
         return params;
     }
-
-//    @Override
-//    public AlbumCreationDetailsBuilder getBuilder() {
-//        return new AlbumCreationDetailsBuilder();
-//    }
 }

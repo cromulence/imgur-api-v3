@@ -5,10 +5,9 @@ public enum Section {
     TOP,
     USER;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
 
     }
-
-    ;
 }

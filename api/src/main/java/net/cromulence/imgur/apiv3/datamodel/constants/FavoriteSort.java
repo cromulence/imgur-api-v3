@@ -4,6 +4,7 @@ public enum FavoriteSort {
     NEWEST,
     OLDEST;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
     }

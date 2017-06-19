@@ -5,9 +5,8 @@ public enum TopicSort {
     TOP,
     TIME;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
     }
-
-    ;
 }

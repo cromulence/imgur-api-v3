@@ -7,10 +7,9 @@ public enum Window {
     YEAR,
     ALL;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
 
     }
-
-    ;
 }	

@@ -5,9 +5,8 @@ public enum CommentSort {
     TOP,
     NEW;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
     }
-
-    ;
 }

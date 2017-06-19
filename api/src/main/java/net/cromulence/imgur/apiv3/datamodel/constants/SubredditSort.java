@@ -5,6 +5,7 @@ public enum SubredditSort {
     TOP,
     TIME;
 
+    @Override
     public String toString() {
         return super.toString().toLowerCase();
 

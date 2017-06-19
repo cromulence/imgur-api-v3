@@ -123,7 +123,8 @@ public class ImgurEndpointTest {
         try {
             Thread.sleep(i);
         } catch (InterruptedException e) {
-            throw new IllegalStateException("Nothing should be interrupting thread's sleep", e);
+            // Do nothing
+            Thread.currentThread().interrupt();
         }
     }
 
