@@ -23,6 +23,18 @@ public class GalleryImageImpl implements Image, GalleryDetails, GalleryImage {
         return image;
     }
 
+    public Image getImage() {
+        return image;
+    }
+
+    public GalleryDetails getDetails() {
+        return details;
+    }
+
+    //    public void setImage(Image image) {
+//        this.image = image;
+//    }
+
     @Override
     public String getName() {
         return image.getName();

@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Comment implements Serializable, Notifiable {
+
     private long id;
 
     @SerializedName("image_id")
@@ -40,12 +41,12 @@ public class Comment implements Serializable, Notifiable {
 
     private Comment[] children;
 
-    public String getId() {
-        return Long.toString(id);
+    public long getId() {
+        return id;
     }
 
-    public void setId(String id) {
-        this.id = Long.parseLong(id);
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getImageId() {
@@ -128,12 +129,12 @@ public class Comment implements Serializable, Notifiable {
         this.datetime = datetime;
     }
 
-    public String getParentId() {
-        return Long.toString(parentId);
+    public long getParentId() {
+        return parentId;
     }
 
-    public void setParentId(String parentId) {
-        this.parentId = Long.parseLong(parentId);
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
     }
 
     public boolean isDeleted() {

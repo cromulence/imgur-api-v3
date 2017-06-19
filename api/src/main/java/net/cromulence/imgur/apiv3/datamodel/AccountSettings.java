@@ -164,12 +164,12 @@ public class AccountSettings {
         this.firstParty = firstParty;
     }
 
-    class BlockedUser {
+    static class BlockedUser {
 
-        // blocked_id
+        @SerializedName("blocked_id")
         String blockedId;
 
-        // blocked_url
+        @SerializedName("blocked_url")
         String blockedUrl;
 
         public String getBlockedId() {

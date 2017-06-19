@@ -11,4 +11,5 @@ dependencies {
 
     testCompile libs.slf4jSimple
     testCompile libs.junit
+    testCompile libs.openPojo
 }

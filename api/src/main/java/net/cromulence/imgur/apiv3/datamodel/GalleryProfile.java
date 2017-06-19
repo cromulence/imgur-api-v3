@@ -23,15 +23,31 @@ public class GalleryProfile {
         return totalGalleryComments;
     }
 
+    public void setTotalGalleryComments(int totalGalleryComments) {
+        this.totalGalleryComments = totalGalleryComments;
+    }
+
     public int getTotalGalleryFavorites() {
         return totalGalleryFavorites;
+    }
+
+    public void setTotalGalleryFavorites(int totalGalleryFavorites) {
+        this.totalGalleryFavorites = totalGalleryFavorites;
     }
 
     public int getTotalGallerySubmissions() {
         return totalGallerySubmissions;
     }
 
+    public void setTotalGallerySubmissions(int totalGallerySubmissions) {
+        this.totalGallerySubmissions = totalGallerySubmissions;
+    }
+
     public Trophy[] getTrophies() {
         return trophies;
+    }
+
+    public void setTrophies(Trophy[] trophies) {
+        this.trophies = trophies;
     }
 }

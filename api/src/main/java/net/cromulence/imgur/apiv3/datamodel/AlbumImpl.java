@@ -47,9 +47,17 @@ public class AlbumImpl implements Album {
         return accountId;
     }
 
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+
     @Override
     public String getAccountUrl() {
         return accountUrl;
+    }
+
+    public void setAccountUrl(String accountUrl) {
+        this.accountUrl = accountUrl;
     }
 
     @Override
@@ -57,9 +65,17 @@ public class AlbumImpl implements Album {
         return link;
     }
 
+    public void setLink(String link) {
+        this.link = link;
+    }
+
     @Override
     public boolean isNsfw() {
         return nsfw;
+    }
+
+    public void setNsfw(boolean nsfw) {
+        this.nsfw = nsfw;
     }
 
     @Override
@@ -67,9 +83,17 @@ public class AlbumImpl implements Album {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public boolean isFavorite() {
         return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
     @Override
@@ -77,9 +101,17 @@ public class AlbumImpl implements Album {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     @Override
     public int getViews() {
         return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
     }
 
     @Override
@@ -87,9 +119,17 @@ public class AlbumImpl implements Album {
         return datetime;
     }
 
+    public void setDatetime(int datetime) {
+        this.datetime = datetime;
+    }
+
     @Override
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -97,9 +137,17 @@ public class AlbumImpl implements Album {
         return inGallery;
     }
 
+    public void setInGallery(boolean inGallery) {
+        this.inGallery = inGallery;
+    }
+
     @Override
     public String getDeleteHash() {
         return deleteHash;
+    }
+
+    public void setDeleteHash(String deleteHash) {
+        this.deleteHash = deleteHash;
     }
 
     @Override
@@ -107,9 +155,17 @@ public class AlbumImpl implements Album {
         return order;
     }
 
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     @Override
     public String getSection() {
         return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 
     @Override
@@ -117,9 +173,17 @@ public class AlbumImpl implements Album {
         return cover;
     }
 
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
     @Override
     public int getCoverHeight() {
         return coverHeight;
+    }
+
+    public void setCoverHeight(int coverHeight) {
+        this.coverHeight = coverHeight;
     }
 
     @Override
@@ -127,9 +191,17 @@ public class AlbumImpl implements Album {
         return coverWidth;
     }
 
+    public void setCoverWidth(int coverWidth) {
+        this.coverWidth = coverWidth;
+    }
+
     @Override
     public Image[] getImages() {
         return images;
+    }
+
+    public void setImages(Image[] images) {
+        this.images = images;
     }
 
     @Override
@@ -137,9 +209,17 @@ public class AlbumImpl implements Album {
         return imagesCount;
     }
 
+    public void setImagesCount(int imagesCount) {
+        this.imagesCount = imagesCount;
+    }
+
     @Override
     public AlbumLayout getLayout() {
         return layout;
+    }
+
+    public void setLayout(AlbumLayout layout) {
+        this.layout = layout;
     }
 
     @Override
@@ -147,11 +227,7 @@ public class AlbumImpl implements Album {
         return privacy;
     }
 
-    public void setImages(Image[] images) {
-        this.images = images;
-    }
-
-    public void setInGallery(boolean inGallery) {
-        this.inGallery = inGallery;
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
     }
 }

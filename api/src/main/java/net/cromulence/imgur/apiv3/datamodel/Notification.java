@@ -1,5 +1,7 @@
 package net.cromulence.imgur.apiv3.datamodel;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Notification<N extends Notifiable> {
 
     /**
@@ -11,7 +13,8 @@ public class Notification<N extends Notifiable> {
     /**
      * The Account ID for the notification
      */
-    private int account_id;
+    @SerializedName("account_id")
+    private int accountId;
 
     /**
      * Has the user viewed the image yet?
@@ -31,12 +34,12 @@ public class Notification<N extends Notifiable> {
         this.id = id;
     }
 
-    public int getAccount_id() {
-        return account_id;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public void setAccount_id(int account_id) {
-        this.account_id = account_id;
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
 
     public boolean isViewed() {
@@ -49,5 +52,9 @@ public class Notification<N extends Notifiable> {
 
     public N getContent() {
         return content;
+    }
+
+    public void setContent(N content) {
+        this.content = content;
     }
 }

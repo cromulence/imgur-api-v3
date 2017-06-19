@@ -20,6 +20,14 @@ public class GalleryAlbumImpl implements Album, GalleryDetails, GalleryAlbum {
         return album;
     }
 
+    public Album getAlbum() {
+        return album;
+    }
+
+    public GalleryDetails getDetails() {
+        return details;
+    }
+
     @Override
     public Long getAccountId() {
         return album.getAccountId();

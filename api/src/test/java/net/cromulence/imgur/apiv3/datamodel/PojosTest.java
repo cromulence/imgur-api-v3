@@ -1,7 +1,5 @@
 package net.cromulence.imgur.apiv3.datamodel;
 
-import static org.junit.Assert.*;
-
 import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.filters.FilterPackageInfo;
 import com.openpojo.reflection.impl.PojoClassFactory;
@@ -13,8 +11,6 @@ import com.openpojo.validation.rule.impl.SetterMustExistRule;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;

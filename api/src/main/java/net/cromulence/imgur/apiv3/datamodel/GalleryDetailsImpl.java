@@ -59,7 +59,7 @@ public class GalleryDetailsImpl implements GalleryDetails {
 
     @Override
     public int getDowns() {
-        return 0;
+        return downs;
     }
 
     public void setDowns(int downs) {
