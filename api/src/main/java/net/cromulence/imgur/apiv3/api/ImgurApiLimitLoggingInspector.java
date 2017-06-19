@@ -45,8 +45,8 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
     @Override
     public void postExecute(HttpRequestBase req, HttpResponse response, ImgurOAuthHandler ah) {
 
-        if(req.getURI().toString().equals(imgur.ACCOUNT.getEndpointUrl()) ||
-           req.getURI().toString().contains(imgur.CREDITS.getEndpointUrl())) {
+        if(req.getURI().toString().equals(imgur.account.getEndpointUrl()) ||
+           req.getURI().toString().contains(imgur.credits.getEndpointUrl())) {
             // account and credits endpoints don't return limit headers - no cost endpoints?
             return;
         }
@@ -108,7 +108,7 @@ public class ImgurApiLimitLoggingInspector implements HttpInspector {
             }
         }
 
-        imgur.CREDITS.update(creds);
+        imgur.credits.update(creds);
     }
 
     private void logLimit(String type, int limit, int remain, String reset) {

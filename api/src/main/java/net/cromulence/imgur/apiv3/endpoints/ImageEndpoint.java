@@ -31,7 +31,7 @@ public class ImageEndpoint extends AbstractEndpoint {
     public Image getImage(String imageId) throws ApiRequestException {
         String imageUrl = endpointUrlWithSinglePathParameter(imageId);
 
-        return getImgur().HTTP.typedGet(imageUrl, Image.class);
+        return getImgur().http.typedGet(imageUrl, Image.class);
     }
 
     public Image uploadImage(ImageUploadDetails details) throws ApiRequestException {
@@ -61,19 +61,19 @@ public class ImageEndpoint extends AbstractEndpoint {
             postParameters.add(new BasicNameValuePair("name", details.getName()));
         }
 
-        return getImgur().HTTP.typedPost(getEndpointUrl(), Image.class, postParameters, authenticated);
+        return getImgur().http.typedPost(getEndpointUrl(), Image.class, postParameters, authenticated);
     }
 
     public void deleteImage(String imageId) throws ApiRequestException {
         String url = getEndpointUrl() + "/" + imageId;
 
-        getImgur().HTTP.delete(url, true);
+        getImgur().http.delete(url, true);
     }
 
     public void deleteAnonymousImage(String deleteHash) throws ApiRequestException {
         String url = getEndpointUrl() + "/" + deleteHash;
 
-        getImgur().HTTP.delete(url, false);
+        getImgur().http.delete(url, false);
     }
 
     public void updateImageInfo(String imageId, String title, String description) throws ApiRequestException {
@@ -92,13 +92,13 @@ public class ImageEndpoint extends AbstractEndpoint {
         postParameters.add(new BasicNameValuePair("title", title));
         postParameters.add(new BasicNameValuePair("description", description));
 
-        getImgur().HTTP.post(url, postParameters, authenticated);
+        getImgur().http.post(url, postParameters, authenticated);
     }
 
     public void favoriteImage(String imageId) throws ApiRequestException {
         String url = String.format("%s/%s/favorite", getEndpointUrl(), imageId);
 
-        getImgur().HTTP.post(url);
+        getImgur().http.post(url);
     }
 
 

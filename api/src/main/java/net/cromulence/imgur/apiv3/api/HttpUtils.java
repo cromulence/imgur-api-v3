@@ -101,16 +101,19 @@ public class HttpUtils implements HttpInspector {
      * is mostly to blame, and trying to solve it with inheritance
      */
 
-    private final JsonDeserializer imageDeserializer = new JsonDeserializer<Image>() {
+    private final JsonDeserializer imageDeserializer = new ImageDeserializer();
+
+    private class ImageDeserializer implements JsonDeserializer<Image> {
 
         @Override
         public Image deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
             return simpleGson.fromJson(json, ImageImpl.class);
         }
-    };
+    }
 
-    private final JsonDeserializer albumDeserializer = new JsonDeserializer<Album>() {
+    private final JsonDeserializer albumDeserializer = new AlbumDeserializer();
 
+    private class AlbumDeserializer implements JsonDeserializer<Album> {
         private static final String IMAGES = "images";
 
         @Override
@@ -134,16 +137,20 @@ public class HttpUtils implements HttpInspector {
 
             return album;
         }
-    };
+    }
 
-    private final JsonDeserializer galleryDeserializer = new JsonDeserializer<GalleryDetails>() {
+    private final JsonDeserializer galleryDeserializer = new GalleryDeserializer();
+
+    private class GalleryDeserializer implements JsonDeserializer<GalleryDetails> {
         @Override
         public GalleryDetails deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
             return simpleGson.fromJson(json, GalleryDetailsImpl.class);
         }
-    };
+    }
 
-    private final JsonDeserializer galleryEntryDeserializer = new JsonDeserializer<GalleryEntry>() {
+    private final JsonDeserializer galleryEntryDeserializer = new GalleryEntryDeserializer();
+
+    private class GalleryEntryDeserializer implements JsonDeserializer<GalleryEntry> {
 
         @Override
         public GalleryEntry deserialize(JsonElement json,
@@ -161,9 +168,11 @@ public class HttpUtils implements HttpInspector {
                 return new GalleryImageImpl(i, gd);
             }
         }
-    };
+    }
 
-    private final JsonDeserializer notifiableDeserializer = new JsonDeserializer<Notifiable>() {
+    private final JsonDeserializer notifiableDeserializer = new NotifiableDeserializer();
+
+    private class NotifiableDeserializer implements JsonDeserializer<Notifiable> {
         @Override
         public Notifiable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
@@ -177,7 +186,9 @@ public class HttpUtils implements HttpInspector {
         }
     };
 
-    private final JsonDeserializer<ApiError> apiErrorJsonDeserializer = new JsonDeserializer<ApiError>() {
+    private final JsonDeserializer<ApiError> apiErrorJsonDeserializer = new ApiErrorJsonDeserializer() ;
+
+    private class ApiErrorJsonDeserializer implements JsonDeserializer<ApiError> {
 
         private static final String ERROR = "error";
 
@@ -205,9 +216,11 @@ public class HttpUtils implements HttpInspector {
                 return simpleGson.fromJson(json, typeOfT);
             }
         }
-    };
+    }
 
-    private final JsonDeserializer<Comment[]> commentArrayJsonDeserializer = new JsonDeserializer<Comment[]>() {
+    private final JsonDeserializer<Comment[]> commentArrayJsonDeserializer = new CommentArrayJsonDeserializer();
+
+    private class CommentArrayJsonDeserializer implements JsonDeserializer<Comment[]> {
         @Override
         public Comment[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
@@ -218,9 +231,11 @@ public class HttpUtils implements HttpInspector {
                 return new Comment[] {simpleGson.fromJson(json, Comment.class)};
             }
         }
-    };
+    }
 
-    private final JsonDeserializer<String[]> stringArrayJsonDeserializer = new JsonDeserializer<String[]>() {
+    private final JsonDeserializer<String[]> stringArrayJsonDeserializer = new StringArrayJsonDeserializer();
+
+    private class StringArrayJsonDeserializer implements JsonDeserializer<String[]> {
         @Override
         public String[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
@@ -391,22 +406,22 @@ public class HttpUtils implements HttpInspector {
         return http(post, authenticated);
     }
 
-    public <T> T typedPost(String URL, TypeToken<T> type, boolean authenticated) throws ApiRequestException {
-        return typedPost(URL, type, null, authenticated);
+    public <T> T typedPost(String url, TypeToken<T> type, boolean authenticated) throws ApiRequestException {
+        return typedPost(url, type, null, authenticated);
     }
 
-    public <T> T typedPost(String URL, TypeToken<T> type, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
-        BasicResponse postResponse = post(URL, params, authenticated);
+    public <T> T typedPost(String url, TypeToken<T> type, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
+        BasicResponse postResponse = post(url, params, authenticated);
 
         return typeResponse(postResponse, type);
     }
 
-    public <T> T typedPost(String URL, Class<T> clazz, boolean authenticated) throws ApiRequestException {
-        return typedPost(URL, clazz, null, authenticated);
+    public <T> T typedPost(String url, Class<T> clazz, boolean authenticated) throws ApiRequestException {
+        return typedPost(url, clazz, null, authenticated);
     }
 
-    public <T> T typedPost(String URL, Class<T> clazz, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
-        return typedPost(URL, TypeToken.get(clazz), params, authenticated);
+    public <T> T typedPost(String url, Class<T> clazz, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
+        return typedPost(url, TypeToken.get(clazz), params, authenticated);
     }
 
     public BasicResponse get(String url) throws ApiRequestException {
@@ -525,11 +540,11 @@ public class HttpUtils implements HttpInspector {
         return typedGet(url, clazz, true);
     }
 
-    public <T> T typedGet(String URL, Class<T> clazz, boolean authenticated) throws ApiRequestException {
-        return typedGet(URL, TypeToken.get(clazz), authenticated);
+    public <T> T typedGet(String url, Class<T> clazz, boolean authenticated) throws ApiRequestException {
+        return typedGet(url, TypeToken.get(clazz), authenticated);
     }
 
-    public <T> T typedGet(String URL, TypeToken<T> type, boolean authenticated) throws ApiRequestException {
+    public <T> T typedGet(String url, TypeToken<T> type, boolean authenticated) throws ApiRequestException {
 
         Throwable lastThrowable = null;
 
@@ -541,7 +556,7 @@ public class HttpUtils implements HttpInspector {
                     LOG.debug("typedGet reattempt {}", attempt);
                 }
 
-                BasicResponse getResponse = get(URL, authenticated);
+                BasicResponse getResponse = get(url, authenticated);
 
                 return typeResponse(getResponse, type);
             } catch (ImgurApiTimeoutException | ImgurServerException e) {
@@ -551,7 +566,7 @@ public class HttpUtils implements HttpInspector {
                     try {
                         Thread.sleep(2500L);
                     } catch (InterruptedException ie) {
-                        // Noop
+                        throw new IllegalStateException("Nothing should be interrupting thread's sleep", e);
                     }
                 }
             }
@@ -639,11 +654,11 @@ public class HttpUtils implements HttpInspector {
         ImgurOAuthHandler ah;
 
         if (authenticated) {
-            ah = getImgur().AUTH_HANDLER;
+            ah = getImgur().authHandler;
             req.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + ah.getAccessToken());
         } else {
             ah = null;
-            req.addHeader(HttpHeaders.AUTHORIZATION, "Client-ID " + getImgur().DATA.getClientId());
+            req.addHeader(HttpHeaders.AUTHORIZATION, "Client-ID " + getImgur().data.getClientId());
         }
 
         preExecute(req, ah);

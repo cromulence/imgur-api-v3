@@ -16,18 +16,18 @@ public class ConversationsEndpoint extends AbstractEndpoint {
     }
 
     public Conversation[] getConversations() throws ApiRequestException {
-        return getImgur().HTTP.typedGet(getEndpointUrl(), Conversation[].class, true);
+        return getImgur().http.typedGet(getEndpointUrl(), Conversation[].class, true);
     }
 
     public Conversation getConversation(int conversationId) throws ApiRequestException {
         final String conversationUrl = endpointUrlWithSinglePathParameter(conversationId);
 
-        return getImgur().HTTP.typedGet(conversationUrl, Conversation.class, true);
+        return getImgur().http.typedGet(conversationUrl, Conversation.class, true);
     }
 
     public Conversation getConversation(int conversationId, int page, int offset) throws ApiRequestException {
         final String conversationUrl = String.format("%s/%d/%d/%d", getEndpointUrl(), conversationId, page, offset);
 
-        return getImgur().HTTP.typedGet(conversationUrl, Conversation.class, true);
+        return getImgur().http.typedGet(conversationUrl, Conversation.class, true);
     }
 }

@@ -11,10 +11,10 @@ import org.junit.Test;
 public class CreditsEndpointTest extends ImgurEndpointTest {
     @Test
     public void getCredits() throws Exception {
-        Credits userOneInitialCredits = getUser1ImgurUnderTest().CREDITS.getCredits();
-        Credits userTwoInitialCredits = getUser2ImgurUnderTest().CREDITS.getCredits();
+        Credits userOneInitialCredits = getUser1ImgurUnderTest().credits.getCredits();
+        Credits userTwoInitialCredits = getUser2ImgurUnderTest().credits.getCredits();
 
-        Credits userOneBeforeGetImageCredits = getUser1ImgurUnderTest().CREDITS.getCredits();
+        Credits userOneBeforeGetImageCredits = getUser1ImgurUnderTest().credits.getCredits();
 
         // check credits unchanged
         assertEquals("client limit should remain the same", userOneInitialCredits.getClientLimit(), userOneBeforeGetImageCredits.getClientLimit());
@@ -22,12 +22,12 @@ public class CreditsEndpointTest extends ImgurEndpointTest {
         assertEquals("user limit should remain the same", userOneInitialCredits.getUserLimit(), userOneBeforeGetImageCredits.getUserLimit());
         assertEquals("credits should be free", userOneInitialCredits.getUserRemaining(), userOneBeforeGetImageCredits.getUserRemaining());
 
-        Paginated<GalleryEntry[]> gallery = getUser1ImgurUnderTest().GALLERY.gallery();
+        Paginated<GalleryEntry[]> gallery = getUser1ImgurUnderTest().gallery.gallery();
         GalleryEntry[] one = gallery.next();
         GalleryEntry[] two = gallery.next();
 
-        Credits userOneAfterGetImageCredits = getUser1ImgurUnderTest().CREDITS.getCredits();
-        Credits userTwoAfterGetImageCredits = getUser2ImgurUnderTest().CREDITS.getCredits();
+        Credits userOneAfterGetImageCredits = getUser1ImgurUnderTest().credits.getCredits();
+        Credits userTwoAfterGetImageCredits = getUser2ImgurUnderTest().credits.getCredits();
 
         // check user one and client credits decreased
         assertEquals("client limit should remain the same", userOneAfterGetImageCredits.getClientLimit(), userOneBeforeGetImageCredits.getClientLimit());

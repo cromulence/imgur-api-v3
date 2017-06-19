@@ -24,25 +24,25 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testAccountSettings() throws ApiRequestException {
-        AccountSettings originalSettings = getUser1ImgurUnderTest().ACCOUNT.getAccountSettings();
+        AccountSettings originalSettings = getUser1ImgurUnderTest().account.getAccountSettings();
 
-        AccountSettings settingsToChange = getUser1ImgurUnderTest().ACCOUNT.getAccountSettings();
+        AccountSettings settingsToChange = getUser1ImgurUnderTest().account.getAccountSettings();
 
         settingsToChange.setMessagingEnabled(!settingsToChange.isMessagingEnabled());
         settingsToChange.setNewsletterSubscribed(!settingsToChange.isNewsletterSubscribed());
         settingsToChange.setShowMature(!settingsToChange.isShowMature());
 
-        getUser1ImgurUnderTest().ACCOUNT.updateAccountSettings(settingsToChange);
+        getUser1ImgurUnderTest().account.updateAccountSettings(settingsToChange);
 
-        AccountSettings changedSettings = getUser1ImgurUnderTest().ACCOUNT.getAccountSettings();
+        AccountSettings changedSettings = getUser1ImgurUnderTest().account.getAccountSettings();
 
         assertNotEquals("should have changed", originalSettings.isMessagingEnabled(), changedSettings.isMessagingEnabled());
         assertNotEquals("should have changed", originalSettings.isNewsletterSubscribed(), changedSettings.isNewsletterSubscribed());
         assertNotEquals("should have changed", originalSettings.isShowMature(), changedSettings.isShowMature());
 
-        getUser1ImgurUnderTest().ACCOUNT.updateAccountSettings(originalSettings);
+        getUser1ImgurUnderTest().account.updateAccountSettings(originalSettings);
 
-        AccountSettings restoredSettings = getUser1ImgurUnderTest().ACCOUNT.getAccountSettings();
+        AccountSettings restoredSettings = getUser1ImgurUnderTest().account.getAccountSettings();
 
         assertEquals("should have restored", originalSettings.isMessagingEnabled(), restoredSettings.isMessagingEnabled());
         assertEquals("should have restored", originalSettings.isNewsletterSubscribed(), restoredSettings.isNewsletterSubscribed());
@@ -51,17 +51,17 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testBioSettings() throws ApiRequestException {
-        String originalBio = getUser1ImgurUnderTest().ACCOUNT.getBaseInfo().getBio();
+        String originalBio = getUser1ImgurUnderTest().account.getBaseInfo().getBio();
 
         assertNotEquals("need to be able to change bio", originalBio, UPDATED_BIO);
 
-        getUser1ImgurUnderTest().ACCOUNT.updateBio(UPDATED_BIO);
+        getUser1ImgurUnderTest().account.updateBio(UPDATED_BIO);
 
-        String changedBio = getUser1ImgurUnderTest().ACCOUNT.getBaseInfo().getBio();
+        String changedBio = getUser1ImgurUnderTest().account.getBaseInfo().getBio();
 
-        getUser1ImgurUnderTest().ACCOUNT.updateBio(originalBio);
+        getUser1ImgurUnderTest().account.updateBio(originalBio);
 
-        String restoredBio = getUser1ImgurUnderTest().ACCOUNT.getBaseInfo().getBio();
+        String restoredBio = getUser1ImgurUnderTest().account.getBaseInfo().getBio();
 
         assertNotEquals("bio should have been changed", originalBio, changedBio);
 
@@ -74,7 +74,7 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testGalleryProfile() throws ApiRequestException {
-        GalleryProfile galleryProfile = getUser1ImgurUnderTest().ACCOUNT.getGalleryProfile();
+        GalleryProfile galleryProfile = getUser1ImgurUnderTest().account.getGalleryProfile();
 
         int totalGalleryComments = galleryProfile.getTotalGalleryComments();
         int totalGalleryFavorites = galleryProfile.getTotalGalleryFavorites();
@@ -89,14 +89,14 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testVerifiedEmail() throws ApiRequestException {
-        assertTrue("already verified", getUser1ImgurUnderTest().ACCOUNT.hasVerifiedEmail());
+        assertTrue("already verified", getUser1ImgurUnderTest().account.hasVerifiedEmail());
 
-        assertFalse("already verified", getUser1ImgurUnderTest().ACCOUNT.requestVerificationEmail());
+        assertFalse("already verified", getUser1ImgurUnderTest().account.requestVerificationEmail());
     }
 
     @Test
     public void testPaginatedGalleryFavourites() throws ApiRequestException {
-        Paginated<GalleryEntry[]> galleryFavourites = getUser1ImgurUnderTest().ACCOUNT.getGalleryFavourites();
+        Paginated<GalleryEntry[]> galleryFavourites = getUser1ImgurUnderTest().account.getGalleryFavourites();
 
         GalleryEntry[] next;
 
@@ -109,7 +109,7 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testPaginatedCommentIds() throws ApiRequestException {
-        Paginated<String[]> galleryFavourites = getUser1ImgurUnderTest().ACCOUNT.getCommentIds("ThisTimeLastYear", AccountCommentSort.NEWEST);
+        Paginated<String[]> galleryFavourites = getUser1ImgurUnderTest().account.getCommentIds("ThisTimeLastYear", AccountCommentSort.NEWEST);
 
         String[] next;
 

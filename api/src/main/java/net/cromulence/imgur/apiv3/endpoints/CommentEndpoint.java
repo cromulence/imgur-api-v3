@@ -26,18 +26,18 @@ public class CommentEndpoint extends AbstractEndpoint {
 
     public Comment getComment(String commentId) throws ApiRequestException {
         String commentUrl = endpointUrlWithSinglePathParameter(commentId);
-        return getImgur().HTTP.typedGet(commentUrl, Comment.class);
+        return getImgur().http.typedGet(commentUrl, Comment.class);
     }
 
     public Comment[] getRepliesToComment(String commentId) throws ApiRequestException {
         String repliesUrl = endpointUrlWithMultiplePathParameters(commentId, "replies");
-        return getImgur().HTTP.typedGet(repliesUrl, Comment.class).getChildren();
+        return getImgur().http.typedGet(repliesUrl, Comment.class).getChildren();
     }
 
     public void deleteComment(String commentId) throws ApiRequestException {
         String deleteUrl = endpointUrlWithSinglePathParameter(commentId);
 
-        getImgur().HTTP.delete(deleteUrl);
+        getImgur().http.delete(deleteUrl);
     }
 
     public String addComment(String imageId, String comment) throws ApiRequestException {
@@ -55,14 +55,14 @@ public class CommentEndpoint extends AbstractEndpoint {
             params.add(new BasicNameValuePair("parent_id", parentCommentId));
         }
 
-        CommentResponseData commentResponse = getImgur().HTTP.typedPost(getEndpointUrl(), CommentResponseData.class, params, true);
+        CommentResponseData commentResponse = getImgur().http.typedPost(getEndpointUrl(), CommentResponseData.class, params, true);
 
         return Long.toString(commentResponse.getId());
     }
 
     public void voteOnComment(String commentId, boolean upvote) throws ApiRequestException {
         String voteUrl = endpointUrlWithMultiplePathParameters(commentId, "vote", upvote ? "up" : "down");
-        getImgur().HTTP.post(voteUrl);
+        getImgur().http.post(voteUrl);
     }
 
     public void reportComment(String commentId) throws ApiRequestException {
@@ -78,6 +78,6 @@ public class CommentEndpoint extends AbstractEndpoint {
             params.add(new BasicNameValuePair("reason", reason.getCode()));
         }
 
-        getImgur().HTTP.post(reportUrl, params, true);
+        getImgur().http.post(reportUrl, params, true);
     }
 }

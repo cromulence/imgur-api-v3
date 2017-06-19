@@ -21,7 +21,7 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
     @Test
     public void getAnonymousImageMethods() throws Exception {
 
-        getUser1ImgurUnderTest().AUTH.refreshToken();
+        getUser1ImgurUnderTest().auth.refreshToken();
 
         // upload
         ImageUploadDetailsBuilder builder = new ImageUploadDetailsBuilder(getClass().getResourceAsStream("/testcard.png"));
@@ -30,13 +30,13 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
 
         ImageUploadDetails details = builder.build();
 
-        Image anonymousImage = getUser1ImgurUnderTest().IMAGE.uploadAnonymousImage(details);
+        Image anonymousImage = getUser1ImgurUnderTest().image.uploadAnonymousImage(details);
 
         final String id = anonymousImage.getId();
 
         {
             // get
-            Image image = getUser1ImgurUnderTest().IMAGE.getImage(id);
+            Image image = getUser1ImgurUnderTest().image.getImage(id);
 
             // confirm same
             assertEquals("title should be as expected", details.getTitle(), anonymousImage.getTitle());
@@ -44,11 +44,11 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
         }
 
         // update info
-        getUser1ImgurUnderTest().IMAGE.updateAnonymousImageInfo(anonymousImage.getDeleteHash(), NEW_TITLE, NEW_DESCRIPTION);
+        getUser1ImgurUnderTest().image.updateAnonymousImageInfo(anonymousImage.getDeleteHash(), NEW_TITLE, NEW_DESCRIPTION);
 
         {
             // get
-            Image image = getUser1ImgurUnderTest().IMAGE.getImage(id);
+            Image image = getUser1ImgurUnderTest().image.getImage(id);
 
             // confirm same
             assertEquals("title should be as expected", NEW_TITLE, image.getTitle());
@@ -56,13 +56,13 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
         }
 
         // delete
-        getUser1ImgurUnderTest().IMAGE.deleteAnonymousImage(anonymousImage.getDeleteHash());
+        getUser1ImgurUnderTest().image.deleteAnonymousImage(anonymousImage.getDeleteHash());
 
         // get fails
         {
             try {
                 // get
-                getUser1ImgurUnderTest().IMAGE.getImage(id);
+                getUser1ImgurUnderTest().image.getImage(id);
                 fail("should have had exception");
             } catch (Exception e) {
                 // ignore
@@ -73,7 +73,7 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
     @Test
     public void getAuthenticatedImageMethods() throws Exception {
 
-        getUser1ImgurUnderTest().AUTH.refreshToken();
+        getUser1ImgurUnderTest().auth.refreshToken();
 
         // upload
         ImageUploadDetailsBuilder builder = new ImageUploadDetailsBuilder(getClass().getResourceAsStream("/testcard.png"));
@@ -82,13 +82,13 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
 
         ImageUploadDetails details = builder.build();
 
-        Image authImage = getUser1ImgurUnderTest().IMAGE.uploadImage(details);
+        Image authImage = getUser1ImgurUnderTest().image.uploadImage(details);
 
         final String id = authImage.getId();
 
         {
             // get
-            Image image = getUser1ImgurUnderTest().IMAGE.getImage(id);
+            Image image = getUser1ImgurUnderTest().image.getImage(id);
 
             // confirm same
             assertEquals("title should be as expected", details.getTitle(), authImage.getTitle());
@@ -97,18 +97,18 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
 
         {
             // user 2 favourites
-            getUser2ImgurUnderTest().IMAGE.favoriteImage(id);
+            getUser2ImgurUnderTest().image.favoriteImage(id);
 
-            Image image = getUser2ImgurUnderTest().IMAGE.getImage(id);
+            Image image = getUser2ImgurUnderTest().image.getImage(id);
 
             assertTrue("should be a favourite", image.isFavorite());
         }
         // update info
-        getUser1ImgurUnderTest().IMAGE.updateImageInfo(id, NEW_TITLE, NEW_DESCRIPTION);
+        getUser1ImgurUnderTest().image.updateImageInfo(id, NEW_TITLE, NEW_DESCRIPTION);
 
         {
             // get
-            Image image = getUser1ImgurUnderTest().IMAGE.getImage(id);
+            Image image = getUser1ImgurUnderTest().image.getImage(id);
 
             // confirm updated
             assertEquals("title should be as expected", NEW_TITLE, image.getTitle());
@@ -116,13 +116,13 @@ public class ImageEndpointIntegrationTest extends ImgurEndpointTest {
         }
 
         // delete
-        getUser1ImgurUnderTest().IMAGE.deleteImage(authImage.getId());
+        getUser1ImgurUnderTest().image.deleteImage(authImage.getId());
 
         // get fails
         {
             try {
                 // get
-                getUser1ImgurUnderTest().IMAGE.getImage(id);
+                getUser1ImgurUnderTest().image.getImage(id);
                 fail("should have had exception");
             } catch (Exception e) {
                 // ignore

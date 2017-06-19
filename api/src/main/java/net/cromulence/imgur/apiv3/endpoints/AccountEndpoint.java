@@ -48,7 +48,7 @@ public class AccountEndpoint extends AbstractEndpoint {
     public Account getBaseInfo(String user) throws ApiRequestException {
         String infoUrl = endpointUrlWithSinglePathParameter(user);
 
-        return getImgur().HTTP.typedGet(infoUrl, Account.class, true);
+        return getImgur().http.typedGet(infoUrl, Account.class, true);
     }
 
     public Paginated<GalleryEntry[]> getAccountGalleryFavourites() throws ApiRequestException {
@@ -103,7 +103,7 @@ public class AccountEndpoint extends AbstractEndpoint {
 
         String favouritesUrl = endpointUrlWithMultiplePathParameters(username, type, page(page), sort.toString());
 
-        return getImgur().HTTP.typedGet(favouritesUrl, GalleryEntry[].class, true);
+        return getImgur().http.typedGet(favouritesUrl, GalleryEntry[].class, true);
     }
 
     public Paginated<GalleryEntry[]> getAccountSubmissions() throws ApiRequestException {
@@ -117,13 +117,13 @@ public class AccountEndpoint extends AbstractEndpoint {
     public GalleryEntry[] getAccountSubmissions(String username, int page) throws ApiRequestException {
         String accountSubmissionUrl = endpointUrlWithMultiplePathParameters(username, "submissions", page(page));
 
-        return getImgur().HTTP.typedGet(accountSubmissionUrl, GalleryEntry[].class, true);
+        return getImgur().http.typedGet(accountSubmissionUrl, GalleryEntry[].class, true);
     }
 
     public AccountSettings getAccountSettings() throws ApiRequestException {
         String settingsUrl = endpointUrlWithMultiplePathParameters(ME, SETTINGS);
 
-        return getImgur().HTTP.typedGet(settingsUrl, AccountSettings.class);
+        return getImgur().http.typedGet(settingsUrl, AccountSettings.class);
     }
 
     public void updateBio(String bio) throws ApiRequestException {
@@ -133,7 +133,7 @@ public class AccountEndpoint extends AbstractEndpoint {
 
         params.add(new BasicNameValuePair("bio", bio));
 
-        getImgur().HTTP.post(settingsUrl, params, true);
+        getImgur().http.post(settingsUrl, params, true);
     }
 
     public void updateAccountSettings(AccountSettings settings) throws ApiRequestException {
@@ -159,7 +159,7 @@ public class AccountEndpoint extends AbstractEndpoint {
         params.add(new BasicNameValuePair("show_mature", Boolean.toString(showMature)));
         params.add(new BasicNameValuePair("newsletter_subscribed", Boolean.toString(newsletterSubscribed)));
 
-        getImgur().HTTP.post(settingsUrl, params, true);
+        getImgur().http.post(settingsUrl, params, true);
     }
 
     public GalleryProfile getGalleryProfile() throws ApiRequestException {
@@ -169,13 +169,13 @@ public class AccountEndpoint extends AbstractEndpoint {
     public GalleryProfile getGalleryProfile(String username) throws ApiRequestException {
         String galleryProfileUrl = endpointUrlWithMultiplePathParameters(username, "gallery_profile");
 
-        return getImgur().HTTP.typedGet(galleryProfileUrl, GalleryProfile.class);
+        return getImgur().http.typedGet(galleryProfileUrl, GalleryProfile.class);
     }
 
     public boolean hasVerifiedEmail() throws ApiRequestException {
         String verifyEmailUrl = endpointUrlWithMultiplePathParameters(ME, "verifyemail");
 
-        return getImgur().HTTP.typedGet(verifyEmailUrl, boolean.class);
+        return getImgur().http.typedGet(verifyEmailUrl, boolean.class);
     }
 
     /**
@@ -185,7 +185,7 @@ public class AccountEndpoint extends AbstractEndpoint {
         String verifyEmailUrl = endpointUrlWithMultiplePathParameters(ME, "verifyemail");
 
         try {
-            getImgur().HTTP.post(verifyEmailUrl);
+            getImgur().http.post(verifyEmailUrl);
             return true;
         } catch (EmailAlreadyVerifiedException e) {
             return false;
@@ -208,11 +208,11 @@ public class AccountEndpoint extends AbstractEndpoint {
     public Album[] getAlbums(String username, int page) throws ApiRequestException {
         String albumUrl = endpointUrlWithMultiplePathParameters(username, ALBUMS, Integer.toString(page));
 
-        return getImgur().HTTP.typedGet(albumUrl, Album[].class);
+        return getImgur().http.typedGet(albumUrl, Album[].class);
     }
 
     public Album getAlbum(String albumId) throws ApiRequestException {
-        return getImgur().ALBUM.getAlbum(albumId);
+        return getImgur().album.getAlbum(albumId);
     }
 
     public String[] getAlbumIds(int page) throws ApiRequestException {
@@ -222,7 +222,7 @@ public class AccountEndpoint extends AbstractEndpoint {
     public String[] getAlbumIds(String username, int page) throws ApiRequestException {
         String albumIdsUrl = endpointUrlWithMultiplePathParameters(username, ALBUMS, "ids", Integer.toString(page));
 
-        return getImgur().HTTP.typedGet(albumIdsUrl, String[].class);
+        return getImgur().http.typedGet(albumIdsUrl, String[].class);
     }
 
     public int getAlbumCount() throws ApiRequestException {
@@ -232,11 +232,11 @@ public class AccountEndpoint extends AbstractEndpoint {
     public int getAlbumCount(String username) throws ApiRequestException {
         String albumCountUrl = endpointUrlWithMultiplePathParameters(username, ALBUMS, COUNT);
 
-        return getImgur().HTTP.typedGet(albumCountUrl, Integer.class);
+        return getImgur().http.typedGet(albumCountUrl, Integer.class);
     }
 
     public void deleteAlbum(String albumId) throws ApiRequestException {
-        getImgur().ALBUM.deleteAlbum(albumId);
+        getImgur().album.deleteAlbum(albumId);
     }
 
     public Paginated<Comment[]> getComments() throws ApiRequestException {
@@ -258,11 +258,11 @@ public class AccountEndpoint extends AbstractEndpoint {
     public Comment[] getComments(String username, AccountCommentSort sort, int page) throws ApiRequestException {
         String commentsUrl = endpointUrlWithMultiplePathParameters(username, COMMENTS, sort.toString(), page(page));
 
-        return getImgur().HTTP.typedGet(commentsUrl, Comment[].class);
+        return getImgur().http.typedGet(commentsUrl, Comment[].class);
     }
 
     public Comment getComment(String commentId) throws ApiRequestException {
-        return getImgur().COMMENT.getComment(commentId);
+        return getImgur().comment.getComment(commentId);
     }
 
     public Paginated<String[]> getCommentIds() throws ApiRequestException {
@@ -276,7 +276,7 @@ public class AccountEndpoint extends AbstractEndpoint {
     public String[] getCommentIds(String username, AccountCommentSort sort, int page) throws ApiRequestException {
         String commentIdsUrl = endpointUrlWithMultiplePathParameters(username, COMMENTS, "ids", sort.toString(), Integer.toString(page));
 
-        return getImgur().HTTP.typedGet(commentIdsUrl, String[].class);
+        return getImgur().http.typedGet(commentIdsUrl, String[].class);
     }
 
     public int getCommentCount() throws ApiRequestException {
@@ -286,11 +286,11 @@ public class AccountEndpoint extends AbstractEndpoint {
     public int getCommentCount(String username) throws ApiRequestException {
         String commentCountUrl = endpointUrlWithMultiplePathParameters(username, COMMENTS, COUNT);
 
-        return getImgur().HTTP.typedGet(commentCountUrl, Integer.class);
+        return getImgur().http.typedGet(commentCountUrl, Integer.class);
     }
 
     public void deleteComment(String commentId) throws ApiRequestException {
-        getImgur().COMMENT.deleteComment(commentId);
+        getImgur().comment.deleteComment(commentId);
     }
 
     public Paginated<Image[]> getImages() throws ApiRequestException {
@@ -304,11 +304,11 @@ public class AccountEndpoint extends AbstractEndpoint {
     public Image[] getImages(String username, int page) throws ApiRequestException {
         String imagesUrl = endpointUrlWithMultiplePathParameters(username, IMAGES, page(page));
 
-        return getImgur().HTTP.typedGet(imagesUrl, Image[].class);
+        return getImgur().http.typedGet(imagesUrl, Image[].class);
     }
 
     public Image getImage(String imageId) throws ApiRequestException {
-        return getImgur().IMAGE.getImage(imageId);
+        return getImgur().image.getImage(imageId);
     }
 
     public Paginated<String[]> getImageIds() throws ApiRequestException {
@@ -322,7 +322,7 @@ public class AccountEndpoint extends AbstractEndpoint {
     public String[] getImageIds(String username, int page) throws ApiRequestException {
         String imageIdsUrl = endpointUrlWithMultiplePathParameters(username, IMAGES, "ids", page(page));
 
-        return getImgur().HTTP.typedGet(imageIdsUrl, String[].class);
+        return getImgur().http.typedGet(imageIdsUrl, String[].class);
     }
 
     public int getImageCount() throws ApiRequestException {
@@ -332,11 +332,11 @@ public class AccountEndpoint extends AbstractEndpoint {
     public int getImageCount(String username) throws ApiRequestException {
         String imageCountUrl = endpointUrlWithMultiplePathParameters(username, IMAGES, COUNT);
 
-        return getImgur().HTTP.typedGet(imageCountUrl, Integer.class);
+        return getImgur().http.typedGet(imageCountUrl, Integer.class);
     }
 
     public void deleteImage(String imageId) throws ApiRequestException {
-        getImgur().IMAGE.deleteImage(imageId);
+        getImgur().image.deleteImage(imageId);
     }
 
 
@@ -349,6 +349,6 @@ public class AccountEndpoint extends AbstractEndpoint {
 
         repliesUrl += "?new=" + newOnly;
 
-        return getImgur().HTTP.typedGet(repliesUrl, Notifications.class, true);
+        return getImgur().http.typedGet(repliesUrl, Notifications.class, true);
     }
 }

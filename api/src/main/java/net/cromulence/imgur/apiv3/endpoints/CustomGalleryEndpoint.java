@@ -32,24 +32,24 @@ public class CustomGalleryEndpoint extends AbstractEndpoint {
     public CustomGallery getCustomGallery(GallerySort sort, GalleryWindow window, int page) throws ApiRequestException {
         String customGalleryUrl = endpointUrlWithMultiplePathParameters(CUSTOM, sort.toString(), window.toString(), page(page));
 
-        return getImgur().HTTP.typedGet(customGalleryUrl, CustomGallery.class);
+        return getImgur().http.typedGet(customGalleryUrl, CustomGallery.class);
     }
 
     public GalleryEntry getEntry(String entryId) throws ApiRequestException {
         String customGalleryUrl = endpointUrlWithMultiplePathParameters(CUSTOM, entryId);
 
-        return getImgur().HTTP.typedGet(customGalleryUrl, GalleryEntry.class);
+        return getImgur().http.typedGet(customGalleryUrl, GalleryEntry.class);
     }
 
     public void addTags(String[] tags) throws ApiRequestException {
         String customGalleryUrl = endpointUrlWithMultiplePathParameters(CUSTOM, "add_tags");
 
-        getImgur().HTTP.put(customGalleryUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tags)));
+        getImgur().http.put(customGalleryUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tags)));
     }
 
     public void removeTags(String[] tags) throws ApiRequestException {
         String customGalleryUrl = endpointUrlWithMultiplePathParameters(CUSTOM, "add_tags");
 
-        getImgur().HTTP.delete(customGalleryUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tags)));
+        getImgur().http.delete(customGalleryUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tags)));
     }
 }

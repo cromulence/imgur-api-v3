@@ -35,31 +35,31 @@ public class NotificationEndpoint extends AbstractEndpoint {
     public Notifications getNotifications(boolean onlyUnviewed) throws ApiRequestException {
         final String notificationsUrl = String.format("%s?new=%b", getEndpointUrl(), onlyUnviewed);
 
-        return getImgur().HTTP.typedGet(notificationsUrl, Notifications.class, true);
+        return getImgur().http.typedGet(notificationsUrl, Notifications.class, true);
     }
 
     public Notification getNotification(int id) throws ApiRequestException {
         final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
 
-        return getImgur().HTTP.typedGet(notificationsUrl, Notification.class, true);
+        return getImgur().http.typedGet(notificationsUrl, Notification.class, true);
     }
 
     public Notification<Comment> getCommentNotification(int id) throws ApiRequestException {
         final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
-        return getImgur().HTTP.typedGet(notificationsUrl, new TypeToken<Notification<Comment>>() {
+        return getImgur().http.typedGet(notificationsUrl, new TypeToken<Notification<Comment>>() {
         }, true);
     }
 
     public Notification<Conversation> getConversationNotification(int id) throws ApiRequestException {
         final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
-        return getImgur().HTTP.typedGet(notificationsUrl, new TypeToken<Notification<Conversation>>() {
+        return getImgur().http.typedGet(notificationsUrl, new TypeToken<Notification<Conversation>>() {
         }, true);
     }
 
     public void markRead(int id) throws ApiRequestException {
         final String notificationsUrl = endpointUrlWithSinglePathParameter(id);
 
-        getImgur().HTTP.typedPost(notificationsUrl, Boolean.class, true);
+        getImgur().http.typedPost(notificationsUrl, Boolean.class, true);
     }
 
     public void markRead(int... ids) throws ApiRequestException {
@@ -78,6 +78,6 @@ public class NotificationEndpoint extends AbstractEndpoint {
 
         params.add(new BasicNameValuePair("ids", sb.toString()));
 
-        getImgur().HTTP.typedPost(getEndpointUrl(), BasicResponse.class, params, true);
+        getImgur().http.typedPost(getEndpointUrl(), BasicResponse.class, params, true);
     }
 }

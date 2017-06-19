@@ -1,12 +1,10 @@
 package net.cromulence.imgur.apiv3.api;
 
-import java.io.Serializable;
-
 /**
  * Imgur API response. Contains status information, and optionally a typed data value.
  * @param <T> The type of the object returned in the responase, if any
  */
-public class BasicResponse<T> implements Serializable {
+public class BasicResponse<T> {
 
     // Any object returned in the response
     private T data;
@@ -14,7 +12,7 @@ public class BasicResponse<T> implements Serializable {
     // Was the request successful?
     private boolean success;
 
-    // HTTP status code
+    // http status code
     private int status;
 
     // The response which this was generated from

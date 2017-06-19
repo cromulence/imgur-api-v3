@@ -17,21 +17,22 @@ import javax.net.ssl.SSLContext;
 
 public class Imgur {
 
-    public final ImgurApplicationData DATA;
+    public final ImgurApplicationData data;
 
-    public final HttpUtils HTTP;
+    public final HttpUtils http;
 
-    public final ImgurOAuthHandler AUTH_HANDLER;
+    public final ImgurOAuthHandler authHandler;
 
-    public final AuthEndpoint AUTH;
-    public final AccountEndpoint ACCOUNT;
-    public final CommentEndpoint COMMENT;
-    public final CreditsEndpoint CREDITS;
-    public final GalleryEndpoint GALLERY;
-    public final ImageEndpoint IMAGE;
-    public final NotificationEndpoint NOTIFICATION;
-    public final TopicEndpoint TOPIC;
-    public final AlbumEndpoint ALBUM;
+    public final AuthEndpoint auth;
+    public final AccountEndpoint account;
+    public final AlbumEndpoint album;
+    public final CommentEndpoint comment;
+    public final CreditsEndpoint credits;
+    public final GalleryEndpoint gallery;
+    public final ImageEndpoint image;
+    public final NotificationEndpoint endpoint;
+    public final TopicEndpoint topic;
+
 
     public Imgur(ImgurApplicationData data) {
         this(data, null, new DefaultAuthHandler());
@@ -46,25 +47,25 @@ public class Imgur {
     }
 
     public Imgur(ImgurApplicationData data, SSLContext ctx, ImgurOAuthHandler authHandler) {
-        DATA = data;
+        this.data = data;
 
         if (ctx == null) {
-            HTTP = new HttpUtils(this);
+            http = new HttpUtils(this);
         } else {
-            HTTP = new HttpUtils(this, ctx);
+            http = new HttpUtils(this, ctx);
         }
 
-        AUTH_HANDLER = authHandler;
+        this.authHandler = authHandler;
 
-        AUTH    = new AuthEndpoint(this);
-        ACCOUNT = new AccountEndpoint(this);
-        ALBUM   = new AlbumEndpoint(this);
-        COMMENT = new CommentEndpoint(this);
-        CREDITS = new CreditsEndpoint(this);
-        GALLERY = new GalleryEndpoint(this);
-        IMAGE   = new ImageEndpoint(this);
-        NOTIFICATION = new NotificationEndpoint(this);
-        TOPIC = new TopicEndpoint(this);
+        auth = new AuthEndpoint(this);
+        account = new AccountEndpoint(this);
+        album = new AlbumEndpoint(this);
+        comment = new CommentEndpoint(this);
+        credits = new CreditsEndpoint(this);
+        gallery = new GalleryEndpoint(this);
+        image = new ImageEndpoint(this);
+        endpoint = new NotificationEndpoint(this);
+        topic = new TopicEndpoint(this);
 
     }
 }

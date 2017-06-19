@@ -38,10 +38,10 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
             b.coverId(id2).title("album title").description("album description").privacy(AlbumPrivacy.HIDDEN).layout(AlbumLayout.grid).imageIds(new String[] {id1, id2, id3});
 
             // publish the album
-            albumIds = getUser1ImgurUnderTest().ALBUM.createAlbum(b.build());
+            albumIds = getUser1ImgurUnderTest().album.createAlbum(b.build());
 
             // get the album
-            Album retrievedAlbum = getUser1ImgurUnderTest().ALBUM.getAlbum(albumIds.getId());
+            Album retrievedAlbum = getUser1ImgurUnderTest().album.getAlbum(albumIds.getId());
 
             // confirm the details of the album
             // TODO
@@ -53,7 +53,7 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
             // delete the album
             if (albumIds != null) {
                 try {
-                    getUser1ImgurUnderTest().ALBUM.deleteAlbum(albumIds.getId());
+                    getUser1ImgurUnderTest().album.deleteAlbum(albumIds.getId());
                 } catch (ApiRequestException e) {
                     System.out.println("Unable to delete album");
                 }
@@ -62,7 +62,7 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
             // Delete the images
             if (id1 != null) {
                 try {
-                    getUser1ImgurUnderTest().IMAGE.deleteImage(id1);
+                    getUser1ImgurUnderTest().image.deleteImage(id1);
                 } catch (ApiRequestException e) {
                     System.out.println("Unable to delete album");
                 }
@@ -70,7 +70,7 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
 
             if (id2 != null) {
                 try {
-                    getUser1ImgurUnderTest().IMAGE.deleteImage(id2);
+                    getUser1ImgurUnderTest().image.deleteImage(id2);
                 } catch (ApiRequestException e) {
                     System.out.println("Unable to delete album");
                 }
@@ -78,7 +78,7 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
 
             if (id3 != null) {
                 try {
-                    getUser1ImgurUnderTest().IMAGE.deleteImage(id3);
+                    getUser1ImgurUnderTest().image.deleteImage(id3);
                 } catch (ApiRequestException e) {
                     System.out.println("Unable to delete album");
                 }
@@ -95,7 +95,7 @@ public class AlbumEndpointTest extends ImgurEndpointTest {
 
         ImageUploadDetails details = builder.build();
 
-        Image image = imgur.IMAGE.uploadImage(details);
+        Image image = imgur.image.uploadImage(details);
 
         return image.getId();
     }

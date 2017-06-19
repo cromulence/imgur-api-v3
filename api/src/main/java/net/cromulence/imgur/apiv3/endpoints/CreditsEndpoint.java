@@ -23,7 +23,7 @@ public class CreditsEndpoint extends AbstractEndpoint {
 
         // TODO explain why credits are a mess
 
-        final Credits newCredits = getImgur().HTTP.typedGet(getEndpointUrl(), Credits.class, true);
+        final Credits newCredits = getImgur().http.typedGet(getEndpointUrl(), Credits.class, true);
 
         if(credits == null) {
             credits = newCredits;

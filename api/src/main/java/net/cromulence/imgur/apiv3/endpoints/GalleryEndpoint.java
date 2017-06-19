@@ -76,7 +76,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
 
         String url = String.format(urlFormat, galleryUrl, showViral);
 
-        return getImgur().HTTP.typedGet(url, GalleryEntry[].class, true);
+        return getImgur().http.typedGet(url, GalleryEntry[].class, true);
     }
 
     public Paginated<MemeEntry[]> getMemes() throws ApiRequestException {
@@ -90,13 +90,13 @@ public class GalleryEndpoint extends AbstractEndpoint {
     public MemeEntry[] getMemes(TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
         String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", sort.toString(), window.toString(), page(page));
 
-        return getImgur().HTTP.typedGet(memeUrl, MemeEntry[].class);
+        return getImgur().http.typedGet(memeUrl, MemeEntry[].class);
     }
 
     public MemeImage getMemeImage(String memeId) throws ApiRequestException {
         String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", memeId);
 
-        return getImgur().HTTP.typedGet(memeUrl, MemeImageImpl.class);
+        return getImgur().http.typedGet(memeUrl, MemeImageImpl.class);
     }
 
     public Paginated<SubredditImage[]> getSubredditImages(String subredditName) {
@@ -110,13 +110,13 @@ public class GalleryEndpoint extends AbstractEndpoint {
     public SubredditImage[] getSubredditImages(String subredditName, SubredditSort sort, GalleryWindow window, int page) throws ApiRequestException {
         String subredditUrl = baseUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), page(page));
 
-        return getImgur().HTTP.typedGet(subredditUrl, SubredditImage[].class);
+        return getImgur().http.typedGet(subredditUrl, SubredditImage[].class);
     }
 
     public SubredditImage getSubredditImage(String subredditName, String imageId) throws ApiRequestException {
         String subredditUrl = baseUrlWithMultiplePathParameters("r", subredditName, imageId);
 
-        return getImgur().HTTP.typedGet(subredditUrl, SubredditImageImpl.class);
+        return getImgur().http.typedGet(subredditUrl, SubredditImageImpl.class);
     }
 
     public Paginated<Tag> getTagImages(String tagName) {
@@ -130,31 +130,31 @@ public class GalleryEndpoint extends AbstractEndpoint {
     public Tag getTagImages(String tagName, TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
         String tagUrl = endpointUrlWithMultiplePathParameters(tagName, sort.toString(), window.toString(), page(page));
 
-        return getImgur().HTTP.typedGet(tagUrl, Tag.class);
+        return getImgur().http.typedGet(tagUrl, Tag.class);
     }
 
     public GalleryImage getTaggedImage(String tagName, String imageId) throws ApiRequestException {
         String tagUrl = endpointUrlWithMultiplePathParameters(tagName, imageId);
 
-        return getImgur().HTTP.typedGet(tagUrl, GalleryImageImpl.class);
+        return getImgur().http.typedGet(tagUrl, GalleryImageImpl.class);
     }
 
     public TagVote[] getEntryTags(String entryId) throws ApiRequestException {
         String tagUrl = endpointUrlWithMultiplePathParameters(entryId, "tags");
 
-        return getImgur().HTTP.typedGet(tagUrl, TagVote[].class);
+        return getImgur().http.typedGet(tagUrl, TagVote[].class);
     }
 
     public void voteOnTag(String entryId, String tagName, boolean upvote) throws ApiRequestException {
         String voteUrl = endpointUrlWithMultiplePathParameters(entryId, "vote", "tag", tagName, upvote ? "up" : "down");
 
-        getImgur().HTTP.post(voteUrl);
+        getImgur().http.post(voteUrl);
     }
 
     public void addTags(String entryId, String[] tagNames) throws ApiRequestException {
         String voteUrl = endpointUrlWithMultiplePathParameters("tags", entryId);
 
-        getImgur().HTTP.post(voteUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tagNames)), true);
+        getImgur().http.post(voteUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tagNames)), true);
     }
 
     // TODO Gallery Search
@@ -167,7 +167,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     public GalleryEntry[] random(int page) throws ApiRequestException {
         String randomUrl = endpointUrlWithMultiplePathParameters("random", "random", page(page));
 
-        return getImgur().HTTP.typedGet(randomUrl, GalleryEntry[].class);
+        return getImgur().http.typedGet(randomUrl, GalleryEntry[].class);
     }
 
     public boolean shareImageWithCommunity(Image image) throws ApiRequestException {
@@ -198,25 +198,25 @@ public class GalleryEndpoint extends AbstractEndpoint {
             params.add(new BasicNameValuePair("mature", "1"));
         }
 
-        return getImgur().HTTP.typedPost(submitUrl, Boolean.class, params, true);
+        return getImgur().http.typedPost(submitUrl, Boolean.class, params, true);
     }
 
     public void removeFromGallery(String id) throws ApiRequestException {
         String submitUrl = endpointUrlWithSinglePathParameter(id);
 
-        getImgur().HTTP.delete(submitUrl, true);
+        getImgur().http.delete(submitUrl, true);
     }
 
     public GalleryAlbum getGalleryAlbum(String albumId) throws ApiRequestException {
         String albumUrl = endpointUrlWithMultiplePathParameters("album", albumId);
 
-        return getImgur().HTTP.typedGet(albumUrl, GalleryAlbumImpl.class);
+        return getImgur().http.typedGet(albumUrl, GalleryAlbumImpl.class);
     }
 
     public GalleryImage getGalleryImage(String imageId) throws ApiRequestException {
         String imageUrl = endpointUrlWithMultiplePathParameters("image", imageId);
 
-        return getImgur().HTTP.typedGet(imageUrl, GalleryImageImpl.class);
+        return getImgur().http.typedGet(imageUrl, GalleryImageImpl.class);
     }
 
     public void reportGalleryEntry(String entryId) throws ApiRequestException {
@@ -232,24 +232,24 @@ public class GalleryEndpoint extends AbstractEndpoint {
             params.add(new BasicNameValuePair("reason", reason.toString()));
         }
 
-        getImgur().HTTP.post(reportUrl, params);
+        getImgur().http.post(reportUrl, params);
     }
 
     public Vote getGalleryEntryVotes(String entryId) throws ApiRequestException {
         String voteUrl = endpointUrlWithMultiplePathParameters(entryId, "votes");
-        return getImgur().HTTP.typedGet(voteUrl, Vote.class);
+        return getImgur().http.typedGet(voteUrl, Vote.class);
     }
 
     public void voteOnGalleryEntry(String entryId, boolean upvote) throws ApiRequestException {
         String voteUrl = endpointUrlWithMultiplePathParameters(entryId, "vote", (upvote ? "up" : "down"));
 
-        getImgur().HTTP.post(voteUrl);
+        getImgur().http.post(voteUrl);
     }
 
     public void clearVoteOnGalleryEntry(String entryId) throws ApiRequestException {
         String voteUrl = endpointUrlWithMultiplePathParameters(entryId, "vote", "veto");
 
-        getImgur().HTTP.post(voteUrl);
+        getImgur().http.post(voteUrl);
     }
 
     public Comment[] albumComments(String id, CommentSort sort) throws ApiRequestException {
@@ -264,13 +264,13 @@ public class GalleryEndpoint extends AbstractEndpoint {
 
         String commentsUrl = endpointUrlWithMultiplePathParameters(type.toString(), id, COMMENTS, sort.toString());
 
-        return getImgur().HTTP.typedGet(commentsUrl, Comment[].class);
+        return getImgur().http.typedGet(commentsUrl, Comment[].class);
     }
 
     public Comment getComment(String entryId, String commentId) throws ApiRequestException {
         String commentUrl = endpointUrlWithMultiplePathParameters(entryId, COMMENT, commentId);
 
-        return getImgur().HTTP.typedGet(commentUrl, Comment.class);
+        return getImgur().http.typedGet(commentUrl, Comment.class);
     }
 
     public String addComment(String entryId, String comment) throws ApiRequestException {
@@ -286,7 +286,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
         params.add(new BasicNameValuePair(COMMENT, comment));
 
         // TODO test
-        CommentResponseData commentResponse = getImgur().HTTP.typedPost(commentUrl, CommentResponseData.class, params, true);
+        CommentResponseData commentResponse = getImgur().http.typedPost(commentUrl, CommentResponseData.class, params, true);
 
         return Long.toString(commentResponse.getId());
     }
@@ -294,12 +294,12 @@ public class GalleryEndpoint extends AbstractEndpoint {
     public String[] getCommentIds(String entryId) throws ApiRequestException {
         String commentIdsUrl = endpointUrlWithMultiplePathParameters(entryId, COMMENTS, "ids");
 
-        return getImgur().HTTP.typedGet(commentIdsUrl, String[].class);
+        return getImgur().http.typedGet(commentIdsUrl, String[].class);
     }
 
     public int getCommentCount(String entryId) throws ApiRequestException {
         String commentCountUrl = endpointUrlWithMultiplePathParameters(entryId, COMMENTS, "count");
 
-        return getImgur().HTTP.typedGet(commentCountUrl, Integer.class);
+        return getImgur().http.typedGet(commentCountUrl, Integer.class);
     }
 }

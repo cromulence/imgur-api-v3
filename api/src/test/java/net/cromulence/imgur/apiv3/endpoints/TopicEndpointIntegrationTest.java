@@ -14,7 +14,7 @@ public class TopicEndpointIntegrationTest extends ImgurEndpointTest {
     @Test
     public void getTopicItems() throws Exception {
 
-        Topic[] defaultTopics = getUser1ImgurUnderTest().TOPIC.getDefaultTopics();
+        Topic[] defaultTopics = getUser1ImgurUnderTest().topic.getDefaultTopics();
 
         for (int i = 0; ((i < 5) && (i < defaultTopics.length)); i++) {
             Topic defaultTopic = defaultTopics[i];
@@ -28,10 +28,10 @@ public class TopicEndpointIntegrationTest extends ImgurEndpointTest {
 
             if (i % 2 == 0) {
                 topicId = defaultTopic.getId();
-                topicItems = getUser1ImgurUnderTest().TOPIC.getTopic(topicId);
+                topicItems = getUser1ImgurUnderTest().topic.getTopic(topicId);
             } else {
                 topicName = defaultTopic.getName();
-                topicItems = getUser1ImgurUnderTest().TOPIC.getTopic(topicName);
+                topicItems = getUser1ImgurUnderTest().topic.getTopic(topicName);
             }
 
             for (int j = 0; ((j < 5) && (j < topicItems.length)); j++) {
@@ -40,9 +40,9 @@ public class TopicEndpointIntegrationTest extends ImgurEndpointTest {
                 GalleryEntry topicItem;
 
                 if (topicName == null) {
-                    topicItem = getUser1ImgurUnderTest().TOPIC.getTopicItem(topicId, item.get().getId());
+                    topicItem = getUser1ImgurUnderTest().topic.getTopicItem(topicId, item.get().getId());
                 } else {
-                    topicItem = getUser1ImgurUnderTest().TOPIC.getTopicItem(topicName, item.get().getId());
+                    topicItem = getUser1ImgurUnderTest().topic.getTopicItem(topicName, item.get().getId());
                 }
 
                 dump(LOG, "topic item", topicItem);

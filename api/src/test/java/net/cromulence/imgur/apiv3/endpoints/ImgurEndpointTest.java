@@ -80,14 +80,14 @@ public class ImgurEndpointTest {
             getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
         }
 
-        getUser1ImgurUnderTest().AUTH.refreshToken();
-        getUser2ImgurUnderTest().AUTH.refreshToken();
+        getUser1ImgurUnderTest().auth.refreshToken();
+        getUser2ImgurUnderTest().auth.refreshToken();
     }
 
     @Before
     public void refreshTokens() throws Exception {
-        getUser1ImgurUnderTest().AUTH.refreshToken();
-        getUser2ImgurUnderTest().AUTH.refreshToken();
+        getUser1ImgurUnderTest().auth.refreshToken();
+        getUser2ImgurUnderTest().auth.refreshToken();
     }
 
     public static Imgur getUser1ImgurUnderTest() {
@@ -123,13 +123,13 @@ public class ImgurEndpointTest {
         try {
             Thread.sleep(i);
         } catch (InterruptedException e) {
-            // noop
+            throw new IllegalStateException("Nothing should be interrupting thread's sleep", e);
         }
     }
 
     private static void getAndExchangePin(Imgur imgur, ImgurOAuthHandler ah, String user) throws IOException, ApiRequestException {
 
-        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s&state=%s", imgur.AUTH.getEndpointUrl(), imgur.DATA.getClientId(), user);
+        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s&state=%s", imgur.auth.getEndpointUrl(), imgur.data.getClientId(), user);
 
         System.out.println(user);
         System.out.println(pinLoginUrl);
@@ -138,6 +138,6 @@ public class ImgurEndpointTest {
 
         String readLine = bin.readLine();
 
-        imgur.AUTH.exchangePin(readLine, ah);
+        imgur.auth.exchangePin(readLine, ah);
     }
 }

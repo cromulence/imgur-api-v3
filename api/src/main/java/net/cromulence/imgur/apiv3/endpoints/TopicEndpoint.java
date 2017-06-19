@@ -31,7 +31,7 @@ public class TopicEndpoint extends AbstractEndpoint {
     public Topic[] getDefaultTopics() throws ApiRequestException {
         String url = endpointUrlWithSinglePathParameter("defaults");
 
-        return getImgur().HTTP.typedGet(url, Topic[].class);
+        return getImgur().http.typedGet(url, Topic[].class);
     }
 
     public GalleryEntry[] getTopic(int topicId) throws ApiRequestException {
@@ -52,7 +52,7 @@ public class TopicEndpoint extends AbstractEndpoint {
 
         String url = String.format(urlFormat, getEndpointUrl(), encode(topicName), (sort == null ? "" : "/" + sort), (page < 0 ? "" : "/" + page), (window == null ? "" : "/" + window));
 
-        return getImgur().HTTP.typedGet(url, GalleryEntry[].class);
+        return getImgur().http.typedGet(url, GalleryEntry[].class);
     }
 
     private String encode(String str) throws ApiRequestException {
@@ -74,6 +74,6 @@ public class TopicEndpoint extends AbstractEndpoint {
 
         String url = String.format(urlFormat, getEndpointUrl(), encode(topicName), itemId);
 
-        return getImgur().HTTP.typedGet(url, GalleryEntry.class, true);
+        return getImgur().http.typedGet(url, GalleryEntry.class, true);
     }
 }
