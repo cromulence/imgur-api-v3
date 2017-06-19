@@ -13,7 +13,6 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
-import net.cromulence.imgur.apiv3.api.exceptions.EmailAlreadyVerifiedException;
 import net.cromulence.imgur.apiv3.api.exceptions.ErrorResponseException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurApiTimeoutException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurServerException;
@@ -429,10 +428,6 @@ public class HttpUtils implements HttpInspector {
                     throw new ApiRequestException("Unknown http error status received: " + response.getStatus());
             }
         } else {
-            if ("User Previously Verified".equals(error.getErrorDetails().getMessage())) {
-                throw new EmailAlreadyVerifiedException();
-            }
-
             switch (error.getErrorDetails().getCode()) {
                 case 1002: // File is over the size limit
                     throw new UploadTooLargeException();

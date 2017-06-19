@@ -51,6 +51,13 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testBioSettings() throws ApiRequestException {
+
+        float reputation = getUser1ImgurUnderTest().account.getBaseInfo().getReputation();
+        assertTrue("Alice's rep should be low-to-terrible", reputation < 1000);
+
+        int created = getUser1ImgurUnderTest().account.getBaseInfo().getCreated();
+        assertTrue("Created some time after 2016", created > 86400 * 365 * (2016 - 1970));
+
         String originalBio = getUser1ImgurUnderTest().account.getBaseInfo().getBio();
 
         assertNotEquals("need to be able to change bio", originalBio, UPDATED_BIO);

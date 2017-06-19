@@ -1,8 +1,8 @@
 package net.cromulence.imgur.apiv3.endpoints;
 
+import net.cromulence.imgur.apiv3.api.BasicResponse;
 import net.cromulence.imgur.apiv3.api.Imgur;
 import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
-import net.cromulence.imgur.apiv3.api.exceptions.EmailAlreadyVerifiedException;
 import net.cromulence.imgur.apiv3.datamodel.Account;
 import net.cromulence.imgur.apiv3.datamodel.AccountSettings;
 import net.cromulence.imgur.apiv3.datamodel.Album;
@@ -179,18 +179,15 @@ public class AccountEndpoint extends AbstractEndpoint {
     }
 
     /**
-     * @return true if the email was requested, false otherwise
+     * @return true if the email was requested, false otherwise. False could mean there was a HTTP error, or that the
+     * user has already verified their email address.
      */
     public boolean requestVerificationEmail() throws ApiRequestException {
         String verifyEmailUrl = endpointUrlWithMultiplePathParameters(ME, "verifyemail");
 
-        try {
-            getImgur().http.post(verifyEmailUrl);
-            return true;
-        } catch (EmailAlreadyVerifiedException e) {
-            return false;
-        }
+        BasicResponse post = getImgur().http.post(verifyEmailUrl);
 
+        return post.isSuccess();
     }
 
     public Album[] getAlbums() throws ApiRequestException {

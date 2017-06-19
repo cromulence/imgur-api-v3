@@ -16,5 +16,8 @@ ext.libs = [
         powerMock:             "org.powermock:powermock-api-mockito:1.6.5",
         powerMockJUnit:        "org.powermock:powermock-module-junit4:1.6.5",
         slf4j:                 "org.slf4j:slf4j-api:1.7.12",
-        slf4jSimple:           "org.slf4j:slf4j-simple:1.7.12"
+        slf4jSimple:           "org.slf4j:slf4j-simple:1.7.12",
+
+
+        openPojo:              "com.openpojo:openpojo:0.8.6"
 ]
