@@ -16,7 +16,6 @@ import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 import net.cromulence.imgur.apiv3.api.exceptions.EmailAlreadyVerifiedException;
 import net.cromulence.imgur.apiv3.api.exceptions.ErrorResponseException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurApiTimeoutException;
-import net.cromulence.imgur.apiv3.api.exceptions.ImgurRequestException;
 import net.cromulence.imgur.apiv3.api.exceptions.ImgurServerException;
 import net.cromulence.imgur.apiv3.api.exceptions.NotAuthorizedException;
 import net.cromulence.imgur.apiv3.api.exceptions.NotFoundException;
@@ -153,16 +152,15 @@ public class HttpUtils implements HttpInspector {
     /**
      * Perform a HTTP request for an initial auth request (logging in)
      */
-    public AuthResponse initialAuth(String url, List<NameValuePair> params) throws ApiRequestException, ImgurApiTimeoutException {
+    public AuthResponse initialAuth(String url, List<NameValuePair> params) throws ApiRequestException {
         return auth(url, params, false);
     }
 
     /**
      * Perform a HTTP request for an auth request
      */
-    public AuthResponse auth(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+    public AuthResponse auth(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         final ApiResponse apiResponse = rawPost(url, params, authenticated);
-
         return new Gson().fromJson(apiResponse.getResponseBody(), AuthResponse.class);
     }
 
@@ -173,7 +171,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url) throws ApiRequestException, ImgurApiTimeoutException {
+    public BasicResponse post(String url) throws ApiRequestException {
         return post(url, true);
     }
 
@@ -185,7 +183,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url, List<NameValuePair> params) throws ApiRequestException, ImgurApiTimeoutException {
+    public BasicResponse post(String url, List<NameValuePair> params) throws ApiRequestException {
         return post(url, params, true);
     }
 
@@ -197,7 +195,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+    public BasicResponse post(String url, boolean authenticated) throws ApiRequestException {
         return post(url, null, authenticated);
     }
 
@@ -210,7 +208,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+    public BasicResponse post(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         ApiResponse apiResponse = rawPost(url, params, authenticated);
 
         BasicResponse response = getAsBasicResponse(apiResponse);
@@ -224,15 +222,15 @@ public class HttpUtils implements HttpInspector {
         return response;
     }
 
-    public ApiResponse rawPost(String url) throws ApiRequestException, ImgurApiTimeoutException {
+    public ApiResponse rawPost(String url) throws ApiRequestException {
         return rawPost(url, null, true);
     }
 
-    public ApiResponse rawPost(String url, List<NameValuePair> params) throws ApiRequestException, ImgurApiTimeoutException {
+    public ApiResponse rawPost(String url, List<NameValuePair> params) throws ApiRequestException {
         return rawPost(url, params, true);
     }
 
-    public ApiResponse rawPost(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+    public ApiResponse rawPost(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         LOG.debug("Posting to url[" + url + "] values[" + params + "]");
 
         HttpPost post = new HttpPost(url);
@@ -322,7 +320,7 @@ public class HttpUtils implements HttpInspector {
         return response;
     }
 
-    public ApiResponse rawPut(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+    public ApiResponse rawPut(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         LOG.debug("Putting to url[" + url + "] values[" + params + "]");
 
         HttpPut put = new HttpPut(url);
@@ -413,7 +411,7 @@ public class HttpUtils implements HttpInspector {
         throw new ApiRequestException("Retries failed, rethrowing last exception", lastThrowable);
     }
 
-    private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ImgurRequestException, ImgurServerException, ApiRequestException {
+    private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ApiRequestException {
 
         // TODO identify some common errors in here and throw more accurate exceptions
         final String responseData = complexGson.toJson(response.getData());
@@ -438,6 +436,9 @@ public class HttpUtils implements HttpInspector {
             switch (error.getErrorDetails().getCode()) {
                 case 1002: // File is over the size limit
                     throw new UploadTooLargeException();
+                default:
+                    // There are cases not dealt with by these codes. Let the generic form at the end handle it
+                    break;
             }
         }
 
@@ -485,7 +486,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException
      * @throws ImgurApiTimeoutException
      */
-    private ApiResponse http(HttpRequestBase req, boolean authenticated) throws ApiRequestException, ImgurApiTimeoutException {
+    private ApiResponse http(HttpRequestBase req, boolean authenticated) throws ApiRequestException {
 
         ImgurOAuthHandler ah;
 
@@ -643,9 +644,9 @@ public class HttpUtils implements HttpInspector {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
 
-            boolean is_album = json.getAsJsonObject().get("is_album").getAsBoolean();
+            boolean isAlbum = json.getAsJsonObject().get("is_album").getAsBoolean();
 
-            if (is_album) {
+            if (isAlbum) {
                 Album a = context.deserialize(json, AlbumImpl.class);
                 return new GalleryAlbumImpl(a, gd);
             } else {
@@ -667,7 +668,7 @@ public class HttpUtils implements HttpInspector {
 
             throw new JsonParseException("Unknown notification type");
         }
-    };
+    }
 
     private class ApiErrorJsonDeserializer implements JsonDeserializer<ApiError> {
 
@@ -740,7 +741,7 @@ public class HttpUtils implements HttpInspector {
 
             return toReturn.toArray(new String[toReturn.size()]);
         }
-    };
+    }
 
     /*
      * Here ends JSON shame. Regular shame resumes.
