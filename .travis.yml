@@ -15,7 +15,7 @@ script:
 - "./gradlew --stacktrace clean check sourceJar javadocJar jacocoFullReport generatePomFileForMavenPublication copyBintrayTemplate"
 - sonar-scanner
 before_deploy:
-- zip /home/travis/zippedBuild/${TRAVIS_BUILD_NUMBER}.zip ./*
+- zip -R /home/travis/zippedBuild/${TRAVIS_BUILD_NUMBER}.zip ./*
 deploy:
 - provider: s3
   on:
