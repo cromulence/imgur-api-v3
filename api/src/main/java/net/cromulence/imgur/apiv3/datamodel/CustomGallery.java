@@ -16,7 +16,7 @@ public class CustomGallery {
     }
 
     public void setAccountUrl(String accountUrl) {
-        accountUrl = accountUrl;
+        this.accountUrl = accountUrl;
     }
 
     public String getLink() {

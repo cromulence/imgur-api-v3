@@ -31,10 +31,6 @@ public class GalleryImageImpl implements Image, GalleryDetails, GalleryImage {
         return details;
     }
 
-    //    public void setImage(Image image) {
-//        this.image = image;
-//    }
-
     @Override
     public String getName() {
         return image.getName();
@@ -100,7 +96,6 @@ public class GalleryImageImpl implements Image, GalleryDetails, GalleryImage {
         return image.getVote();
     }
 
-
     @Override
     public int getWidth() {
         return image.getWidth();
@@ -160,7 +155,6 @@ public class GalleryImageImpl implements Image, GalleryDetails, GalleryImage {
     public String getId() {
         return image.getId();
     }
-
 
     @Override
     public int getCommentCount() {

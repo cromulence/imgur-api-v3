@@ -1,24 +1,13 @@
 package net.cromulence.imgur.apiv3.datamodel;
 
-import java.io.Serializable;
-
-public class ApiError implements Serializable {
-
-    // {!error":"Image format not supported, or image is corrupt.","request":"\/3\/image","method":"POST"}
-    // {"error":"Operation timed out after 10ith 0 bytes received","request":"\/3\/gallery\/hot\/viral\/366","method":"GET"}}
+public class ApiError {
 
     /*
-    "data":{
-        "error":{
-            "code":1002,
-            "message":"File is over the size limit",
-            "type":"ImgurException",
-            "exception":[]
-        },
-        "request":"\/3\/image",
-        "method":"POST"
-    },
-    */
+     * Samples of Error JSON
+     * Bad image {!error":"Image format not supported, or image is corrupt.","request":"\/3\/image","method":"POST"}
+     * timeout {"error":"Operation timed out after 10ith 0 bytes received","request":"\/3\/gallery\/hot\/viral\/366","method":"GET"}}
+     * too big "request":"\/3\/image","method":"POST","data":{"error":{"code":1002,"message":"File is over the size limit","type":"ImgurException","exception":[] },},
+     */
 
     private ErrorDetails errorDetails;
     private String request;
