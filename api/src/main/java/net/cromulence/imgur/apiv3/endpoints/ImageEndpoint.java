@@ -96,10 +96,21 @@ public class ImageEndpoint extends AbstractEndpoint {
     }
 
     public void favoriteImage(String imageId) throws ApiRequestException {
-        String url = String.format("%s/%s/favorite", getEndpointUrl(), imageId);
-
-        getImgur().http.post(url);
+        favoriteImage(imageId, true);
     }
 
+    public void unfavoriteImage(String imageId) throws ApiRequestException {
+        favoriteImage(imageId, false);
+    }
 
+    private void favoriteImage(String imageId, boolean favourite) throws ApiRequestException {
+        final String url = String.format("%s/%s/favorite", getEndpointUrl(), imageId);
+
+        if(favourite) {
+            getImgur().http.post(url);
+        } else {
+            getImgur().http.delete(url);
+        }
+
+    }
 }

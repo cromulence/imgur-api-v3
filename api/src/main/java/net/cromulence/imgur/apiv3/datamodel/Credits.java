@@ -124,6 +124,10 @@ public class Credits implements Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.format("Credits{postLimit=%d, postRemaining=%d, postReset=%d, userLimit=%d, userRemaining=%d, userReset=%d, clientLimit=%d, clientRemaining=%d}", postLimit, postRemaining, postReset, userLimit, userRemaining, userReset, clientLimit, clientRemaining);
+    }
 
-    // {"data":{"UserLimit":500,"UserRemaining":500,"UserReset":1464006639,"ClientLimit":12500,"ClientRemaining":12500},"success":true,"status":200}
+// {"data":{"UserLimit":500,"UserRemaining":500,"UserReset":1464006639,"ClientLimit":12500,"ClientRemaining":12500},"success":true,"status":200}
 }
