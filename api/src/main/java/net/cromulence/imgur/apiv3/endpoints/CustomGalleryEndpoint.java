@@ -21,11 +21,11 @@ public class CustomGalleryEndpoint extends AbstractEndpoint {
         return "g";
     }
 
-    public Paginated<CustomGallery> getCustomGallery() throws ApiRequestException {
+    public Paginated<CustomGallery> getCustomGallery() {
         return getCustomGallery(GallerySort.VIRAL, GalleryWindow.WEEK);
     }
 
-    public Paginated<CustomGallery> getCustomGallery(GallerySort sort, GalleryWindow window) throws ApiRequestException {
+    public Paginated<CustomGallery> getCustomGallery(GallerySort sort, GalleryWindow window) {
         return new Paginated<>((int page) -> getCustomGallery(sort, window, page));
     }
 

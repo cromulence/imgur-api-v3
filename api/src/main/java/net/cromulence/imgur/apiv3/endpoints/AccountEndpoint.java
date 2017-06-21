@@ -51,19 +51,19 @@ public class AccountEndpoint extends AbstractEndpoint {
         return getImgur().http.typedGet(infoUrl, Account.class, true);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites() throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getAccountGalleryFavourites() {
         return getAccountGalleryFavourites(ME, FavoriteSort.NEWEST);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(FavoriteSort sort) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(FavoriteSort sort) {
         return getAccountGalleryFavourites(ME, sort);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(String username) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(String username) {
         return getAccountGalleryFavourites(username, FavoriteSort.NEWEST);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(String username, FavoriteSort sort) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(String username, FavoriteSort sort)  {
         return new Paginated<>((int page) -> getAccountGalleryFavourites(username, page, sort));
     }
 
@@ -75,19 +75,19 @@ public class AccountEndpoint extends AbstractEndpoint {
         return doGetFavourites(username, page, sort, "gallery_favorites");
     }
 
-    public Paginated<GalleryEntry[]> getGalleryFavourites() throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getGalleryFavourites() {
         return getGalleryFavourites(ME, FavoriteSort.NEWEST);
     }
 
-    public Paginated<GalleryEntry[]> getGalleryFavourites(FavoriteSort sort) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getGalleryFavourites(FavoriteSort sort) {
         return getGalleryFavourites(ME, sort);
     }
 
-    public Paginated<GalleryEntry[]> getGalleryFavourites(String username) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getGalleryFavourites(String username) {
         return getGalleryFavourites(username, FavoriteSort.NEWEST);
     }
 
-    public Paginated<GalleryEntry[]> getGalleryFavourites(String username, FavoriteSort sort) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getGalleryFavourites(String username, FavoriteSort sort) {
         return new Paginated<>((int page) -> getGalleryFavourites(username, page, sort));
     }
 
@@ -106,11 +106,11 @@ public class AccountEndpoint extends AbstractEndpoint {
         return getImgur().http.typedGet(favouritesUrl, GalleryEntry[].class, true);
     }
 
-    public Paginated<GalleryEntry[]> getAccountSubmissions() throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getAccountSubmissions() {
         return getAccountSubmissions(ME);
     }
 
-    public Paginated<GalleryEntry[]> getAccountSubmissions(String username) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> getAccountSubmissions(String username) {
         return new Paginated<>((int page) -> getAccountSubmissions(username, page));
     }
 
@@ -236,19 +236,19 @@ public class AccountEndpoint extends AbstractEndpoint {
         getImgur().album.deleteAlbum(albumId);
     }
 
-    public Paginated<Comment[]> getComments() throws ApiRequestException {
+    public Paginated<Comment[]> getComments() {
         return getComments(ME, AccountCommentSort.NEWEST);
     }
 
-    public Paginated<Comment[]> getComments(String username) throws ApiRequestException {
+    public Paginated<Comment[]> getComments(String username) {
         return getComments(username, AccountCommentSort.NEWEST);
     }
 
-    public Paginated<Comment[]> getComments(AccountCommentSort sort) throws ApiRequestException {
+    public Paginated<Comment[]> getComments(AccountCommentSort sort) {
         return getComments(ME, sort);
     }
 
-    public Paginated<Comment[]> getComments(String username, AccountCommentSort sort) throws ApiRequestException {
+    public Paginated<Comment[]> getComments(String username, AccountCommentSort sort) {
         return new Paginated<>((int page) -> getComments(username, sort, page));
     }
 
@@ -262,11 +262,11 @@ public class AccountEndpoint extends AbstractEndpoint {
         return getImgur().comment.getComment(commentId);
     }
 
-    public Paginated<String[]> getCommentIds() throws ApiRequestException {
+    public Paginated<String[]> getCommentIds() {
         return getCommentIds(ME, AccountCommentSort.NEWEST);
     }
 
-    public Paginated<String[]> getCommentIds(String username, AccountCommentSort sort) throws ApiRequestException {
+    public Paginated<String[]> getCommentIds(String username, AccountCommentSort sort) {
         return new Paginated<>((int page) -> getCommentIds(username, sort, page));
     }
 
@@ -290,11 +290,11 @@ public class AccountEndpoint extends AbstractEndpoint {
         getImgur().comment.deleteComment(commentId);
     }
 
-    public Paginated<Image[]> getImages() throws ApiRequestException {
+    public Paginated<Image[]> getImages() {
         return getImages(ME);
     }
 
-    public Paginated<Image[]> getImages(String username) throws ApiRequestException {
+    public Paginated<Image[]> getImages(String username) {
         return new Paginated<>((int page) -> getImages(username, page));
     }
 
@@ -308,11 +308,11 @@ public class AccountEndpoint extends AbstractEndpoint {
         return getImgur().image.getImage(imageId);
     }
 
-    public Paginated<String[]> getImageIds() throws ApiRequestException {
+    public Paginated<String[]> getImageIds() {
         return getImageIds(ME);
     }
 
-    public Paginated<String[]> getImageIds(String username) throws ApiRequestException {
+    public Paginated<String[]> getImageIds(String username) {
         return new Paginated<>((int page) -> getImageIds(username, page));
     }
 

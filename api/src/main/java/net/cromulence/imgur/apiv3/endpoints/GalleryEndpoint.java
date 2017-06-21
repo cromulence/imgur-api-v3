@@ -52,11 +52,11 @@ public class GalleryEndpoint extends AbstractEndpoint {
         return ENDPOINT_NAME;
     }
 
-    public Paginated<GalleryEntry[]> gallery() throws ApiRequestException {
+    public Paginated<GalleryEntry[]> gallery() {
         return gallery(HOT, GallerySort.VIRAL, GalleryWindow.DAY, true);
     }
 
-    public Paginated<GalleryEntry[]> gallery(Section section, GallerySort sort, GalleryWindow window, boolean showViral) throws ApiRequestException {
+    public Paginated<GalleryEntry[]> gallery(Section section, GallerySort sort, GalleryWindow window, boolean showViral) {
         return new Paginated<>((int page) -> gallery(section, sort, window, page, showViral));
     }
 
@@ -79,11 +79,11 @@ public class GalleryEndpoint extends AbstractEndpoint {
         return getImgur().http.typedGet(url, GalleryEntry[].class, true);
     }
 
-    public Paginated<MemeEntry[]> getMemes() throws ApiRequestException {
+    public Paginated<MemeEntry[]> getMemes() {
         return getMemes(TopicSort.VIRAL, GalleryWindow.WEEK);
     }
 
-    public Paginated<MemeEntry[]> getMemes(TopicSort sort, GalleryWindow window) throws ApiRequestException {
+    public Paginated<MemeEntry[]> getMemes(TopicSort sort, GalleryWindow window) {
         return new Paginated<>((int page) -> getMemes(sort, window, page));
     }
 
@@ -160,7 +160,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     // TODO Gallery Search
 
 
-    public Paginated<GalleryEntry[]> random() throws ApiRequestException {
+    public Paginated<GalleryEntry[]> random() {
         return new Paginated<>(this::random);
     }
 
