@@ -102,29 +102,6 @@ subprojects {
     }
 }
 
-
-task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-  dependsOn = subprojects.test
-  additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
-  sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-  classDirectories = files(subprojects.sourceSets.main.output)
-  executionData = files(subprojects.jacocoTestReport.executionData)
-  reports {
-    html.enabled = true
-    xml.enabled = true
-    csv.enabled = false
-  }
-  onlyIf = {
-    true
-  }
-  doFirst {
-    executionData = files(executionData.findAll {
-      it.exists()
-    })
-  }
-}
-
-
 task codeCoverageReport(type: JacocoReport) {
   executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
@@ -146,11 +123,6 @@ task jacocoMerge(type: JacocoMerge) {
   destinationFile = file("${buildDir}/jacoco/test.exec")
   executionData = files(subprojects.jacocoTestReport.executionData).filter { f -> f.exists() }
 }
-
-
-//jacocoMerge {
-//  executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-//}
 
 codeCoverageReport.dependsOn {
   subprojects*.test
