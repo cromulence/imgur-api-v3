@@ -12,7 +12,7 @@ addons:
     token:
       secure: oKrYx6FEWMkJaJUMwSD8Uc5lUohwOvn35Ddt5NG8ff80qY7GelQX8u7VlA05FstN5d+IuRMujiGPN2ctme8Kzj6yrjTWtxomzn+yLibMN57iSgC2VSPqyU8k2llmXDnzm+IkNOEMcDh9lUNq/AIniV0XrYZbf+P/QjMc9/3DXq4CBd02xQBs3FAnqnLDq6Nk17VyhYBc/QhDhTe+0h4Dt+94w/EWqvV3HrUR345igGivr+cz8yRGHY3dKKgYhxNeqAv8DxiFRFthlt+tTdPiWrNsE/BT5/awOs+4nDEB2T6eI2HmHIOlbyQ/ypxXINR41Z2crp7SYXkl909JEgr1ez99iuAxWnpdrWwWBjIu+Ez1bsIrQoD3LiLWnt//z6LoygUo7PnZA4aSnqiUWlMEsFOH+NlOtG7cF4mkc/DldXIAheHkWZYo7peeWvKL5hwOM3MEN8zr3bN+ZoR/QNMEwu/saz0Nsmgg5/zdOJBmAnavh6Uu8R+LaAyuvNqkcMH1EW5ZOQny0EcDUEyWuIempZcqZj3bBDIecGkUfuIZRO1NnzJrnR4ZldU/YZ6EOYW88eOGBzLr3mxU4f/fG4Cc8IfMfqFC/v/MN4P6Q0nVkKUSgZefElP5dNsacNXm/wvqLiNZj7r83ml7Krf2LYramwvS2Uzxun3jUEMGU0IbAm0=
 script:
-- "./gradlew --stacktrace clean check sourceJar javadocJar jacocoFullReport generatePomFileForMavenPublication copyBintrayTemplate"
+- "./gradlew --stacktrace clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
 - sonar-scanner
 before_deploy:
 - zip -r /home/travis/zippedBuild/${TRAVIS_BUILD_NUMBER}.zip .
