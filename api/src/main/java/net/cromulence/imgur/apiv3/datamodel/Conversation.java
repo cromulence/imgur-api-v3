@@ -2,9 +2,7 @@ package net.cromulence.imgur.apiv3.datamodel;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
-public class Conversation implements Serializable, Notifiable {
+public class Conversation implements Notifiable {
 
     /** Conversation ID */
     private int id;

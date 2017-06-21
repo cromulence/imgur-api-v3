@@ -1,8 +1,9 @@
 package net.cromulence.imgur.apiv3.datamodel;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class ErrorDetails {
+public class ErrorDetails implements Serializable {
 
     /*
         "code":1002,

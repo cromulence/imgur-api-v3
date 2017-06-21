@@ -1,6 +1,8 @@
 package net.cromulence.imgur.apiv3.datamodel;
 
-public class ApiError {
+import java.io.Serializable;
+
+public class ApiError implements Serializable {
 
     /*
      * Samples of Error JSON

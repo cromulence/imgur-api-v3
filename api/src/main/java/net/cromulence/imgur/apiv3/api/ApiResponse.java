@@ -4,11 +4,13 @@ import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 
 import org.apache.http.HttpResponse;
 
+import java.io.Serializable;
+
 /**
  * Encapsulated HTTP response
  */
-public class ApiResponse {
-    private final HttpResponse response;
+public class ApiResponse implements Serializable {
+    private final transient HttpResponse response;
     private String responseBody;
 
     public ApiResponse(HttpResponse response) throws ApiRequestException {

@@ -6,9 +6,9 @@ import net.cromulence.datawrapper.DataWrapper;
 import net.cromulence.datawrapper.DataWrapperImpl;
 import net.cromulence.datawrapper.properties.PropertiesFileDataStoreConnector;
 import net.cromulence.imgur.apiv3.ImgurDatastore;
-import net.cromulence.imgur.apiv3.ImgurOAuthDataImpl;
 import net.cromulence.imgur.apiv3.api.Imgur;
 import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
+import net.cromulence.imgur.apiv3.auth.ImgurOAuthData;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.auth.PersistingOAuthHandler;
 
@@ -63,8 +63,8 @@ public class ImgurEndpointTest {
 
         data = new ImgurDatastore(dw);
 
-        ImgurOAuthDataImpl user1AuthData = new ImgurOAuthDataImpl(propertiesFileDataStoreConnector, "alice");
-        ImgurOAuthDataImpl user2AuthData = new ImgurOAuthDataImpl(propertiesFileDataStoreConnector, "bob");
+        ImgurOAuthData user1AuthData = new ImgurDatastore(propertiesFileDataStoreConnector, "alice");
+        ImgurOAuthData user2AuthData = new ImgurDatastore(propertiesFileDataStoreConnector, "bob");
 
         user1Auth = new PersistingOAuthHandler(user1AuthData);
         user2Auth = new PersistingOAuthHandler(user2AuthData);
