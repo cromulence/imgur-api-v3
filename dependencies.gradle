@@ -4,7 +4,7 @@ ext.libs = [
         datawrapperApi:        "net.cromulence.datawrapper:datawrapper-api:${ext.datawrapperVersion}",
         datawrapperProperties: "net.cromulence.datawrapper:properties:${ext.datawrapperVersion}",
         guava:                 "com.google.guava:guava:17.0",
-        gson:                  "com.google.code.gson:gson:2.2.4",
+        gson:                  "com.google.code.gson:gson:2.8.1",
         httpclient:            "org.apache.httpcomponents:httpclient:4.5.2",
         jacksonDatabind:       "com.fasterxml.jackson.core:jackson-databind:2.5.1",
         jacksonDataformat:     "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.5.1",

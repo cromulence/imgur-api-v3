@@ -28,6 +28,9 @@ import net.cromulence.imgur.apiv3.datamodel.constants.TopicSort;
 import net.cromulence.imgur.apiv3.datamodel.meme.MemeEntry;
 import net.cromulence.imgur.apiv3.datamodel.meme.MemeImage;
 import net.cromulence.imgur.apiv3.datamodel.meme.MemeImageImpl;
+import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditAlbum;
+import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditAlbumImpl;
+import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditEntry;
 import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditImage;
 import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditImageImpl;
 
@@ -99,24 +102,32 @@ public class GalleryEndpoint extends AbstractEndpoint {
         return getImgur().http.typedGet(memeUrl, MemeImageImpl.class);
     }
 
-    public Paginated<SubredditImage[]> getSubredditImages(String subredditName) {
-        return getSubredditImages(subredditName, SubredditSort.TIME, GalleryWindow.WEEK);
+    public Paginated<SubredditEntry[]> getSubredditGalleries(String subredditName) {
+        return getSubredditGalleries(subredditName, SubredditSort.TIME, GalleryWindow.WEEK);
     }
 
-    public Paginated<SubredditImage[]> getSubredditImages(String subredditName, SubredditSort sort, GalleryWindow window) {
-        return new Paginated<>((int page) -> getSubredditImages(subredditName, sort, window, page));
+    public Paginated<SubredditEntry[]> getSubredditGalleries(String subredditName, SubredditSort sort, GalleryWindow window) {
+        return new Paginated<>((int page) -> getSubredditGalleries(subredditName, sort, window, page));
     }
 
-    public SubredditImage[] getSubredditImages(String subredditName, SubredditSort sort, GalleryWindow window, int page) throws ApiRequestException {
-        String subredditUrl = baseUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), page(page));
+    public SubredditEntry[] getSubredditGalleries(String subredditName, SubredditSort sort, GalleryWindow window, int page) throws ApiRequestException {
+        String subredditUrl = endpointUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), page(page));
 
-        return getImgur().http.typedGet(subredditUrl, SubredditImage[].class);
+        return getImgur().http.typedGet(subredditUrl, SubredditEntry[].class);
     }
 
     public SubredditImage getSubredditImage(String subredditName, String imageId) throws ApiRequestException {
-        String subredditUrl = baseUrlWithMultiplePathParameters("r", subredditName, imageId);
+        String subredditImageUrl = endpointUrlWithMultiplePathParameters("r", subredditName, imageId);
 
-        return getImgur().http.typedGet(subredditUrl, SubredditImageImpl.class);
+        return getImgur().http.typedGet(subredditImageUrl, SubredditImageImpl.class);
+    }
+
+    public SubredditAlbum getSubredditAlbum(String subredditName, String albumId) throws ApiRequestException {
+        String subredditAlbumUrl = endpointUrlWithMultiplePathParameters("r", subredditName, albumId);
+
+        SubredditEntry subredditAlbum = getImgur().http.typedGet(subredditAlbumUrl, SubredditAlbumImpl.class);
+
+        return (SubredditAlbum) subredditAlbum;
     }
 
     public Paginated<Tag> getTagImages(String tagName) {

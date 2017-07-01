@@ -12,4 +12,8 @@ public class MemeAlbumImpl extends GalleryAlbumImpl implements MemeAlbum {
 
         this.metadata = metadata;
     }
+
+    public MemeMetadata getMetadata() {
+        return metadata;
+    }
 }
