@@ -9,7 +9,12 @@ public class Paginated<T> {
     private int page = 0;
 
     Paginated(PageLoader<T> loader) {
+        this(loader, 0);
+    }
+
+    Paginated(PageLoader<T> loader, int intialPage) {
         this.loader = loader;
+        this.page = intialPage;
     }
 
     public T next() throws ApiRequestException {
