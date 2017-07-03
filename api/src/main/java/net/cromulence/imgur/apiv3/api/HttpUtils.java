@@ -37,6 +37,13 @@ import net.cromulence.imgur.apiv3.datamodel.GalleryImageImpl;
 import net.cromulence.imgur.apiv3.datamodel.Image;
 import net.cromulence.imgur.apiv3.datamodel.ImageImpl;
 import net.cromulence.imgur.apiv3.datamodel.Notifiable;
+import net.cromulence.imgur.apiv3.datamodel.meme.MemeAlbumImpl;
+import net.cromulence.imgur.apiv3.datamodel.meme.MemeEntry;
+import net.cromulence.imgur.apiv3.datamodel.meme.MemeImageImpl;
+import net.cromulence.imgur.apiv3.datamodel.meme.MemeMetadata;
+import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditAlbumImpl;
+import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditEntry;
+import net.cromulence.imgur.apiv3.datamodel.subreddit.SubredditImageImpl;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -102,6 +109,8 @@ public class HttpUtils implements HttpInspector {
     private final JsonDeserializer apiErrorJsonDeserializer = new ApiErrorJsonDeserializer();
     private final JsonDeserializer commentArrayJsonDeserializer = new CommentArrayJsonDeserializer();
     private final JsonDeserializer stringArrayJsonDeserializer = new StringArrayJsonDeserializer();
+    private final JsonDeserializer memeEntryDeserializer = new MemeEntryDeserializer();
+    private final JsonDeserializer subredditEntryDeserializer = new SubredditEntryDeserializer();
 
     HttpUtils(Imgur imgur) {
         this(imgur, HttpClients.createDefault());
@@ -137,6 +146,8 @@ public class HttpUtils implements HttpInspector {
             registerTypeHierarchyAdapter(ApiError.class, apiErrorJsonDeserializer).
             registerTypeHierarchyAdapter(Comment[].class, commentArrayJsonDeserializer).
             registerTypeHierarchyAdapter(String[].class, stringArrayJsonDeserializer).
+            registerTypeHierarchyAdapter(MemeEntry.class, memeEntryDeserializer).
+            registerTypeHierarchyAdapter(SubredditEntry.class, subredditEntryDeserializer).
             create();
     }
 
@@ -208,17 +219,9 @@ public class HttpUtils implements HttpInspector {
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
     public BasicResponse post(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
-        ApiResponse apiResponse = rawPost(url, params, authenticated);
+        ApiResponse postResponse = rawPost(url, params, authenticated);
 
-        BasicResponse response = getAsBasicResponse(apiResponse);
-
-        if (!response.isSuccess()) {
-            // Throw the appropriate exception
-            LOG.error("Error response to post: {}", apiResponse);
-            getExceptionFromErrorResponse(url, response);
-        }
-
-        return response;
+        return handleApiResponse(url, postResponse);
     }
 
     public ApiResponse rawPost(String url) throws ApiRequestException {
@@ -264,6 +267,15 @@ public class HttpUtils implements HttpInspector {
     private BasicResponse get(String url, boolean authenticated) throws ApiRequestException {
         ApiResponse getResponse = rawGet(url, authenticated);
 
+        return handleApiResponse(url, getResponse);
+    }
+
+    private BasicResponse handleApiResponse(String url, ApiResponse getResponse) throws ApiRequestException {
+        if(!getResponse.isSuccess()) {
+            LOG.error("Error response to get: {}", getResponse);
+            getExceptionFromApiResponse(url, getResponse);
+        }
+
         BasicResponse response = getAsBasicResponse(getResponse);
 
         if (!response.isSuccess()) {
@@ -290,15 +302,7 @@ public class HttpUtils implements HttpInspector {
     public BasicResponse delete(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         ApiResponse deleteResponse = rawDelete(url, params, authenticated);
 
-        BasicResponse response = getAsBasicResponse(deleteResponse);
-
-        if (!response.isSuccess()) {
-            // Throw the appropriate exception
-            LOG.error("Error response to delete: {}", deleteResponse);
-            getExceptionFromErrorResponse(url, response);
-        }
-
-        return response;
+        return handleApiResponse(url, deleteResponse);
     }
 
     public BasicResponse put(String url, List<NameValuePair> params) throws ApiRequestException {
@@ -308,15 +312,7 @@ public class HttpUtils implements HttpInspector {
     public BasicResponse put(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         ApiResponse putResponse = rawPut(url, params, authenticated);
 
-        BasicResponse response = getAsBasicResponse(putResponse);
-
-        if (!response.isSuccess()) {
-            // Throw the appropriate exception
-            LOG.error("Error response to put: {}", putResponse);
-            getExceptionFromErrorResponse(url, response);
-        }
-
-        return response;
+        return handleApiResponse(url, putResponse);
     }
 
     public ApiResponse rawPut(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
@@ -357,6 +353,9 @@ public class HttpUtils implements HttpInspector {
         return http(delete, authenticated);
     }
 
+    /*
+     * HttpDelete doesn't allow you to specify a payload, so we need to mislabel a POST
+     */
     private class TerribleDelete extends HttpPost {
         public TerribleDelete(String url) {
             super(url);
@@ -411,6 +410,23 @@ public class HttpUtils implements HttpInspector {
         throw new ApiRequestException("Retries failed, rethrowing last exception", lastThrowable);
     }
 
+    private void getExceptionFromApiResponse(String url, ApiResponse response) throws ApiRequestException {
+        getExceptionFromStatusCode(url, response.getStatusCode());
+    }
+
+    private void getExceptionFromStatusCode(String url, int statusCode) throws ApiRequestException {
+        switch (statusCode) {
+            case 403:
+                throw new NotAuthorizedException(url);
+            case 404:
+                throw new NotFoundException(url);
+            case 429:
+                throw new RateLimitedException(url);
+            default:
+                throw new ApiRequestException("Unknown http error status received: " + statusCode);
+        }
+    }
+
     private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ApiRequestException {
 
         // TODO identify some common errors in here and throw more accurate exceptions
@@ -418,16 +434,7 @@ public class HttpUtils implements HttpInspector {
         final ApiError error = complexGson.fromJson(responseData, ApiError.class);
 
         if (error.getErrorDetails() == null) {
-            switch (response.getStatus()) {
-                case 403:
-                    throw new NotAuthorizedException(url);
-                case 404:
-                    throw new NotFoundException(url);
-                case 429:
-                    throw new RateLimitedException(url);
-                default:
-                    throw new ApiRequestException("Unknown http error status received: " + response.getStatus());
-            }
+            getExceptionFromStatusCode(url, response.getStatus());
         } else {
             if ("User Previously Verified".equals(error.getErrorDetails().getMessage())) {
                 // No exception needed here
@@ -744,7 +751,59 @@ public class HttpUtils implements HttpInspector {
         }
     }
 
+    private class MemeEntryDeserializer implements JsonDeserializer<MemeEntry> {
+
+        @Override
+        public MemeEntry deserialize(JsonElement json,
+            Type typeOfT, JsonDeserializationContext context) {
+
+            GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
+
+            boolean isAlbum = json.getAsJsonObject().get("is_album").getAsBoolean();
+            MemeMetadata mmd = null;
+
+            if(json.getAsJsonObject().has("meme_metadata")) {
+                mmd = context.deserialize(json.getAsJsonObject().get("meme_metadata"), MemeMetadata.class);
+            }
+
+            if (isAlbum) {
+                Album a = context.deserialize(json, AlbumImpl.class);
+                return new MemeAlbumImpl(a, gd, mmd);
+            } else {
+                Image i = context.deserialize(json, ImageImpl.class);
+                return new MemeImageImpl(i, gd, mmd);
+            }
+        }
+    }
+
+    private class SubredditEntryDeserializer implements JsonDeserializer<SubredditEntry> {
+
+        @Override
+        public SubredditEntry deserialize(JsonElement json,
+            Type typeOfT, JsonDeserializationContext context) {
+
+            GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
+
+            boolean isAlbum = json.getAsJsonObject().get("is_album").getAsBoolean();
+            MemeMetadata mmd = null;
+
+            if(json.getAsJsonObject().has("meme_metadata")) {
+                mmd = context.deserialize(json.getAsJsonObject().get("meme_metadata"), MemeMetadata.class);
+            }
+
+            if (isAlbum) {
+                Album a = context.deserialize(json, AlbumImpl.class);
+                return new SubredditAlbumImpl(a, gd, null);
+            } else {
+                Image i = context.deserialize(json, ImageImpl.class);
+                return new SubredditImageImpl(i, gd, null);
+            }
+        }
+    }
+
     /*
      * Here ends JSON shame. Regular shame resumes.
      */
 }
+
+

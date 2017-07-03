@@ -47,4 +47,8 @@ public class ApiResponse implements Serializable {
     public String toString() {
         return getStatusCode() + " " + getReasonPhrase() + "\nResponse Object:\n" + getResponse() + "\nResponse body\n" + getResponseBody();
     }
+
+    public boolean isSuccess() {
+        return getStatusCode() >= 200 && getStatusCode() <= 299;
+    }
 }
