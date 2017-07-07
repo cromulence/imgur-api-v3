@@ -8,7 +8,6 @@ public class SubredditImageImpl extends GalleryImageImpl implements SubredditIma
 
     private final String redditCommentsUrl;
 
-    // TODO deserializer
     public SubredditImageImpl(Image image, GalleryDetails details, String redditCommentsUrl) {
         super(image, details);
         this.redditCommentsUrl = redditCommentsUrl;

@@ -429,11 +429,12 @@ public class HttpUtils implements HttpInspector {
 
     private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ApiRequestException {
 
-        // TODO identify some common errors in here and throw more accurate exceptions
+        // Identify common errors in here and throw more accurate exceptions
         final String responseData = complexGson.toJson(response.getData());
         final ApiError error = complexGson.fromJson(responseData, ApiError.class);
 
         if (error.getErrorDetails() == null) {
+            // If we have no higher-level error, just use the HTTP status in the response
             getExceptionFromStatusCode(url, response.getStatus());
         } else {
             if ("User Previously Verified".equals(error.getErrorDetails().getMessage())) {
@@ -527,12 +528,14 @@ public class HttpUtils implements HttpInspector {
 
         LOG.debug(String.format("http response: code[%d] message[%s] size[%s]", apiResponse.getStatusCode(), apiResponse.getReasonPhrase(), cl));
 
-        // TODO Do we need to deal with redirect?
-        if (apiResponse.getStatusCode() > 299) {
+        // Never seen redirect (3xx), so it isn't handled. If it comes up, this is the place to fix it
+
+        // Log all errors
+        if (apiResponse.getStatusCode() >= 400) {
             LOG.debug("Unable to " + req.getClass().getSimpleName() + " url[" + req.getURI() + "] statuscode[" + apiResponse.getStatusCode() + "] reason[" + apiResponse.getReasonPhrase() + "]");
         }
 
-        if (apiResponse.getStatusCode() == 503) {
+        if (apiResponse.getStatusCode() >= 500) {
             throw new ImgurServerException(apiResponse);
         }
 
