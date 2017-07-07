@@ -135,7 +135,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public Paginated<Tag> getTagImages(String tagName, TopicSort sort, GalleryWindow window) {
-        return new Paginated<>((int page) -> getTagImages(tagName, sort, window, page));
+        return new Paginated<>(page -> getTagImages(tagName, sort, window, page));
     }
 
     public Tag getTagImages(String tagName, TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
@@ -168,8 +168,21 @@ public class GalleryEndpoint extends AbstractEndpoint {
         getImgur().http.post(voteUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tagNames)), true);
     }
 
-    // TODO Gallery Search
+    public Paginated<GalleryEntry[]> search(String searchString) {
+        return search(searchString, TopicSort.TIME, GalleryWindow.ALL);
+    }
 
+    public Paginated<GalleryEntry[]> search(String searchString, TopicSort sort, GalleryWindow window) {
+        return new Paginated<>( page -> search(searchString, sort, window, page));
+    }
+
+    public GalleryEntry[] search(String searchString, TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
+        // This is basic search only ('q' parameter). The client is responsible for constructing a valid search string
+        String searchUrl = endpointUrlWithMultiplePathParameters("search", sort.toString(), window.toString(), page(page));
+        searchUrl += "?q=" + searchString;
+
+        return getImgur().http.typedGet(searchUrl, GalleryEntry[].class);
+    }
 
     public Paginated<GalleryEntry[]> random() {
         return new Paginated<>(this::random);
@@ -296,7 +309,6 @@ public class GalleryEndpoint extends AbstractEndpoint {
 
         params.add(new BasicNameValuePair(COMMENT, comment));
 
-        // TODO test
         CommentResponseData commentResponse = getImgur().http.typedPost(commentUrl, CommentResponseData.class, params, true);
 
         return Long.toString(commentResponse.getId());
