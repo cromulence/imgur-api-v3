@@ -74,12 +74,9 @@ public class GalleryEndpoint extends AbstractEndpoint {
         // showViral 	optional 	true | false - Show or hide viral images from the 'user' section. Defaults to true
 
         String galleryUrl = endpointUrlWithMultiplePathParameters(section.toString(), sort.toString(), window.toString(), page(page));
+        galleryUrl += "?showViral=" + showViral;
 
-        String urlFormat = "%s?showViral=%b";
-
-        String url = String.format(urlFormat, galleryUrl, showViral);
-
-        return getImgur().http.typedGet(url, GalleryEntry[].class, true);
+        return getImgur().http.typedGet(galleryUrl, GalleryEntry[].class, true);
     }
 
     public Paginated<MemeEntry[]> getMemes() {
@@ -91,13 +88,15 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public MemeEntry[] getMemes(TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
-        String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", sort.toString(), window.toString(), page(page));
+        // Memes exist in an endpoint called 'g' but are logically part of the gallery endpoint
+        final String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", sort.toString(), window.toString(), page(page));
 
         return getImgur().http.typedGet(memeUrl, MemeEntry[].class);
     }
 
     public MemeImage getMemeImage(String memeId) throws ApiRequestException {
-        String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", memeId);
+        // Memes exist in an endpoint called 'g' but are logically part of the gallery endpoint
+        final String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", memeId);
 
         return getImgur().http.typedGet(memeUrl, MemeImageImpl.class);
     }
@@ -111,13 +110,15 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public SubredditEntry[] getSubredditGalleries(String subredditName, SubredditSort sort, GalleryWindow window, int page) throws ApiRequestException {
-        String subredditUrl = endpointUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), page(page));
+        // Subreddits exist in an endpoint called 'r' but are logically part of the gallery endpoint
+        final String subredditUrl = endpointUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), page(page));
 
         return getImgur().http.typedGet(subredditUrl, SubredditEntry[].class);
     }
 
     public SubredditImage getSubredditImage(String subredditName, String imageId) throws ApiRequestException {
-        String subredditImageUrl = endpointUrlWithMultiplePathParameters("r", subredditName, imageId);
+        // Subreddits exist in an endpoint called 'r' but are logically part of the gallery endpoint
+        final String subredditImageUrl = endpointUrlWithMultiplePathParameters("r", subredditName, imageId);
 
         return getImgur().http.typedGet(subredditImageUrl, SubredditImageImpl.class);
     }
@@ -211,7 +212,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     private boolean shareWithCommunity(String id, GalleryEntryType type, String title, boolean mature) throws ApiRequestException {
-        String submitUrl = getEndpointUrl() + "/" + type + "/" + id;
+        final String submitUrl = endpointUrlWithMultiplePathParameters(type.toString(), id);
 
         ArrayList<NameValuePair> params = new ArrayList<>();
 
@@ -226,19 +227,19 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public void removeFromGallery(String id) throws ApiRequestException {
-        String submitUrl = endpointUrlWithSinglePathParameter(id);
+        final String submitUrl = endpointUrlWithSinglePathParameter(id);
 
         getImgur().http.delete(submitUrl, true);
     }
 
     public GalleryAlbum getGalleryAlbum(String albumId) throws ApiRequestException {
-        String albumUrl = endpointUrlWithMultiplePathParameters("album", albumId);
+        final String albumUrl = endpointUrlWithMultiplePathParameters("album", albumId);
 
         return getImgur().http.typedGet(albumUrl, GalleryAlbumImpl.class);
     }
 
     public GalleryImage getGalleryImage(String imageId) throws ApiRequestException {
-        String imageUrl = endpointUrlWithMultiplePathParameters("image", imageId);
+        final String imageUrl = endpointUrlWithMultiplePathParameters("image", imageId);
 
         return getImgur().http.typedGet(imageUrl, GalleryImageImpl.class);
     }
