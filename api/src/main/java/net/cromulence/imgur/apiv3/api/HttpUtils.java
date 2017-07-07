@@ -80,6 +80,9 @@ public class HttpUtils implements HttpInspector {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class.getName());
 
+    private static final String JSON_FIELD_IS_ALBUM = "is_album";
+    private static final String JSON_FIELD_MEME_METADATA = "meme_metadata";
+
     private static final int CONNECTION_TIMEOUT_MS = 10 * 1000;
 
     private static final int MAX_RETRIES = 3;
@@ -470,14 +473,13 @@ public class HttpUtils implements HttpInspector {
 
     /**
      * This method assumes a success response
-     * @param response
-     * @param type
-     * @param <T>
-     * @return
-     * @throws ErrorResponseException
-     * @throws ResponseTypeException
+     * @param response Imgur API response
+     * @param type Encapsulation of T
+     * @param <T> Type to case the response payload to
+     * @return Instance of T
+     * @throws ResponseTypeException If casting to the specified type fails
      */
-    private <T> T typeResponse(BasicResponse response, TypeToken<T> type) throws ErrorResponseException, ResponseTypeException {
+    private <T> T typeResponse(BasicResponse response, TypeToken<T> type) throws ResponseTypeException {
         final String responseData = complexGson.toJson(response.getData());
 
         try {
@@ -490,10 +492,9 @@ public class HttpUtils implements HttpInspector {
     /**
      * Make a HTTP request
      * @param req Request to execute
-     * @param authenticated
+     * @param authenticated true if the authentication details should be included with the request
      * @return HTTP response
-     * @throws ApiRequestException
-     * @throws ImgurApiTimeoutException
+     * @throws ApiRequestException Any exception which happens with the request
      */
     private ApiResponse http(HttpRequestBase req, boolean authenticated) throws ApiRequestException {
 
@@ -575,18 +576,14 @@ public class HttpUtils implements HttpInspector {
     }
 
     public static String readStream(InputStream content) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(content));
-
         StringBuilder all = new StringBuilder();
         String read;
-        try {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(content))) {
             while ((read = br.readLine()) != null) {
                 all.append(read).append("\n");
             }
 
             return all.toString();
-        } finally {
-            br.close();
         }
     }
 
@@ -655,7 +652,7 @@ public class HttpUtils implements HttpInspector {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
 
-            boolean isAlbum = json.getAsJsonObject().get("is_album").getAsBoolean();
+            boolean isAlbum = json.getAsJsonObject().get(JSON_FIELD_IS_ALBUM).getAsBoolean();
 
             if (isAlbum) {
                 Album a = context.deserialize(json, AlbumImpl.class);
@@ -762,11 +759,11 @@ public class HttpUtils implements HttpInspector {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
 
-            boolean isAlbum = json.getAsJsonObject().get("is_album").getAsBoolean();
+            boolean isAlbum = json.getAsJsonObject().get(JSON_FIELD_IS_ALBUM).getAsBoolean();
             MemeMetadata mmd = null;
 
-            if(json.getAsJsonObject().has("meme_metadata")) {
-                mmd = context.deserialize(json.getAsJsonObject().get("meme_metadata"), MemeMetadata.class);
+            if(json.getAsJsonObject().has(JSON_FIELD_MEME_METADATA)) {
+                mmd = context.deserialize(json.getAsJsonObject().get(JSON_FIELD_MEME_METADATA), MemeMetadata.class);
             }
 
             if (isAlbum) {
@@ -787,12 +784,7 @@ public class HttpUtils implements HttpInspector {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
 
-            boolean isAlbum = json.getAsJsonObject().get("is_album").getAsBoolean();
-            MemeMetadata mmd = null;
-
-            if(json.getAsJsonObject().has("meme_metadata")) {
-                mmd = context.deserialize(json.getAsJsonObject().get("meme_metadata"), MemeMetadata.class);
-            }
+            boolean isAlbum = json.getAsJsonObject().get(JSON_FIELD_IS_ALBUM).getAsBoolean();
 
             if (isAlbum) {
                 Album a = context.deserialize(json, AlbumImpl.class);
