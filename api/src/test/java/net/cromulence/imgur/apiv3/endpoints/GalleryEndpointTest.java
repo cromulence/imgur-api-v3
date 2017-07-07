@@ -104,7 +104,8 @@ public class GalleryEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testVotes() throws ApiRequestException {
-        GalleryEntry[] gallery = getUser1ImgurUnderTest().gallery.gallery(Section.HOT, GallerySort.VIRAL, GalleryWindow.DAY, 0, true);
+        // Go a few pages in to minimise the chance of new votes coming in
+        GalleryEntry[] gallery = getUser1ImgurUnderTest().gallery.gallery(Section.HOT, GallerySort.VIRAL, GalleryWindow.WEEK, 100, true);
 
         if(gallery.length == 0) {
             fail("No images in gallery");
