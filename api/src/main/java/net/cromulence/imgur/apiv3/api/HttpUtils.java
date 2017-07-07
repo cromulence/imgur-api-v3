@@ -273,17 +273,33 @@ public class HttpUtils implements HttpInspector {
         return handleApiResponse(url, getResponse);
     }
 
-    private BasicResponse handleApiResponse(String url, ApiResponse getResponse) throws ApiRequestException {
-        if(!getResponse.isSuccess()) {
-            LOG.error("Error response to get: {}", getResponse);
-            getExceptionFromApiResponse(url, getResponse);
+    private BasicResponse handleApiResponse(String url, ApiResponse apiResponse) throws ApiRequestException {
+        if(!apiResponse.isSuccess()) {
+
+            try {
+                BasicResponse response = getAsBasicResponse(apiResponse);
+
+                if (!response.isSuccess()) {
+                    // Throw the appropriate exception
+                    LOG.error("Error response to get: {}", response);
+                    getExceptionFromErrorResponse(url, response);
+                } else {
+                    throw new ApiRequestException(String.format("HTTP error receieved with non-error payload: status:%d %s payload:%s", apiResponse.getStatusCode(), apiResponse.getReasonPhrase(), response));
+                }
+
+                return response;
+            } catch (Throwable t) {
+                LOG.error("Unable to get error response from apiResponse", t);
+                LOG.error("Error response to request: {}", apiResponse);
+                getExceptionFromApiResponse(url, apiResponse);
+            }
         }
 
-        BasicResponse response = getAsBasicResponse(getResponse);
+        BasicResponse response = getAsBasicResponse(apiResponse);
 
         if (!response.isSuccess()) {
             // Throw the appropriate exception
-            LOG.error("Error response to get: {}", getResponse);
+            LOG.error("Error response to get: {}", response);
             getExceptionFromErrorResponse(url, response);
         }
 
@@ -414,6 +430,8 @@ public class HttpUtils implements HttpInspector {
     }
 
     private void getExceptionFromApiResponse(String url, ApiResponse response) throws ApiRequestException {
+
+
         getExceptionFromStatusCode(url, response.getStatusCode());
     }
 
