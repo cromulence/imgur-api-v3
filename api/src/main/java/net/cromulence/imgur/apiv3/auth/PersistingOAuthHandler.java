@@ -42,10 +42,17 @@ public class PersistingOAuthHandler extends AbstractAuthHandler {
     }
 
     @Override
+    public String getUsername() {
+        return data.getUsername();
+    }
+
+    @Override
     public void logout() {
         data.setUsername(null);
         data.setAccessToken(null);
         data.setAccessTokenTimeout(-1);
     }
+
+
 
 }

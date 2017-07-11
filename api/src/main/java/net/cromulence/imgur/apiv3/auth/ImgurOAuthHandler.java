@@ -18,4 +18,6 @@ public interface ImgurOAuthHandler {
     void logout();
 
     boolean hasValidAccessToken();
+
+    String getUsername();
 }

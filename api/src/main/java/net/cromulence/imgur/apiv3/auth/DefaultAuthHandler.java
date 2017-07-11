@@ -12,6 +12,7 @@ public class DefaultAuthHandler extends AbstractAuthHandler {
     private String refreshToken;
     private String accessToken;
     private long accessTokenTimeout;
+    private String username;
 
     @Override
     public void handleAuth(AuthResponse ar) {
@@ -40,10 +41,16 @@ public class DefaultAuthHandler extends AbstractAuthHandler {
     }
 
     @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
     public void logout() {
         accessTokenTimeout = -1;
         accessToken = null;
         refreshToken = null;
+        username = null;
     }
 
 }
