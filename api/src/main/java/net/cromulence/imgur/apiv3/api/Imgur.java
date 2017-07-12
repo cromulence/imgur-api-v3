@@ -33,6 +33,34 @@ public class Imgur {
     public final NotificationEndpoint endpoint;
     public final TopicEndpoint topic;
 
+    /**
+     * Simplest possible constructor
+     * @param clientId Imgur application client id
+     * @param clientSecret Imgur application client secret
+     */
+    public Imgur(String clientId, String clientSecret) {
+        this(new ImgurApplicationData() {
+            @Override
+            public String getClientId() {
+                return clientId;
+            }
+
+            @Override
+            public void setClientId(String clientId) {
+                // no op
+            }
+
+            @Override
+            public String getClientSecret() {
+                return clientSecret;
+            }
+
+            @Override
+            public void setClientSecret(String clientSecret) {
+                // no op
+            }
+        }, null, new DefaultAuthHandler());
+    }
 
     public Imgur(ImgurApplicationData data) {
         this(data, null, new DefaultAuthHandler());
