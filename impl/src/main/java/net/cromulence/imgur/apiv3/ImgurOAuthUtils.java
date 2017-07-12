@@ -10,13 +10,16 @@ import java.io.InputStreamReader;
 
 public class ImgurOAuthUtils {
 
+    /**
+     * Utility method to help authenticate a console-based session
+     * @param imgur Imgur API object
+     * @param ah OAuth Handler
+     * @throws IOException If there are problems reading from stdin
+     * @throws ApiRequestException If there are problems communicating with Imgur
+     */
     public static void getAndExchangePin(Imgur imgur, ImgurOAuthHandler ah) throws IOException, ApiRequestException {
-        getAndExchangePin(imgur, ah, null);
-    }
 
-    public static void getAndExchangePin(Imgur imgur, ImgurOAuthHandler ah, String state) throws IOException, ApiRequestException {
-
-        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s%s", imgur.auth.getEndpointUrl(), imgur.data.getClientId(), (state == null ? "" : "&state=" + state));
+        String pinLoginUrl = String.format("%s/authorize?response_type=pin&client_id=%s", imgur.auth.getEndpointUrl(), imgur.data.getClientId());
 
         System.out.println("Go to this URL in your browser, log in as the user you wish to use");
         System.out.println(pinLoginUrl);
