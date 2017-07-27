@@ -4,6 +4,7 @@ import net.cromulence.imgur.apiv3.api.Imgur;
 import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.datamodel.AuthResponse;
+import net.cromulence.imgur.apiv3.datamodel.constants.AuthResponseType;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -32,12 +33,12 @@ public class AuthEndpoint extends AbstractEndpoint {
         return String.format("%s/%s", BASE_API_URL, getEndpointName());
     }
 
-    private List<NameValuePair> authParams(String grantType, String name, String value) {
+    private List<NameValuePair> authParams(AuthResponseType grantType, String name, String value) {
         final List<NameValuePair> params = new ArrayList<>();
 
         params.add(new BasicNameValuePair("client_id", getImgur().data.getClientId()));
         params.add(new BasicNameValuePair("client_secret", getImgur().data.getClientSecret()));
-        params.add(new BasicNameValuePair("grant_type", grantType));
+        params.add(new BasicNameValuePair("grant_type", grantType.toString()));
         params.add(new BasicNameValuePair(name, value));
 
         return params;
@@ -46,7 +47,7 @@ public class AuthEndpoint extends AbstractEndpoint {
     public void exchangePin(String pin, ImgurOAuthHandler ah) throws IOException, ApiRequestException {
         final String url = endpointUrlWithSinglePathParameter("token");
 
-        final AuthResponse auth = getImgur().http.initialAuth(url, authParams("pin", "pin", pin));
+        final AuthResponse auth = getImgur().http.initialAuth(url, authParams(AuthResponseType.PIN, "pin", pin));
 
         LOG.debug("exchangePin: got auth response accessToken[" + auth.getAccessToken() + "] refreshToken[" + auth.getRefreshToken() + "] expiresIn[" + auth.getExpiresIn() + "]");
 
@@ -54,11 +55,11 @@ public class AuthEndpoint extends AbstractEndpoint {
     }
 
     public boolean exchangeCode(String code) throws IOException, ApiRequestException {
-        return doToken(authParams("authorization_code", "code", code));
+        return doToken(authParams(AuthResponseType.AUTHORIZATION_CODE, "code", code));
     }
 
     public boolean refreshToken() throws IOException, ApiRequestException {
-        return doToken(authParams("refresh_token", "refresh_token", getImgur().authHandler.getRefreshToken()));
+        return doToken(authParams(AuthResponseType.REFRESH_TOKEN, "refresh_token", getImgur().authHandler.getRefreshToken()));
     }
 
     protected boolean doToken(List<NameValuePair> params) throws IOException, ApiRequestException {
