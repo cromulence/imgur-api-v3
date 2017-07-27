@@ -37,8 +37,7 @@ public class ImgurOAuthUtils {
      * Utility method to generate an auth URL
      * @param imgur Imgur API object
      * @param authResponseType pin etc
-     * @throws IOException If there are problems reading from stdin
-     * @throws ApiRequestException If there are problems communicating with Imgur
+     * @return Auth URL
      */
     public static String getAuthUrl(Imgur imgur, AuthResponseType authResponseType) {
         return String.format("%s/authorize?response_type=%sn&client_id=%s", imgur.auth.getEndpointUrl(), authResponseType, imgur.data.getClientId());
