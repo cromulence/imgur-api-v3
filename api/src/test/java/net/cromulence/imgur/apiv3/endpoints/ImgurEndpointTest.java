@@ -1,8 +1,11 @@
 package net.cromulence.imgur.apiv3.endpoints;
 
+import static junit.framework.TestCase.fail;
+
 import com.google.gson.GsonBuilder;
 
 import net.cromulence.datawrapper.DataWrapper;
+import net.cromulence.datawrapper.DataWrapperException;
 import net.cromulence.datawrapper.DataWrapperImpl;
 import net.cromulence.datawrapper.properties.PropertiesFileDataStoreConnector;
 import net.cromulence.imgur.apiv3.ImgurDatastore;
@@ -21,6 +24,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class ImgurEndpointTest {
 
@@ -36,16 +42,22 @@ public class ImgurEndpointTest {
     private static PersistingOAuthHandler user1Auth;
     private static PersistingOAuthHandler user2Auth;
 
-    private static String[] propertiesPaths = new String[]{"./impl/src/test/resources", "./src/test/resources", "/home/travis"};
+    private static String[] propertiesPaths = new String[]{"./api/src/test/resources", "./src/test/resources", "/home/travis"};
 
     @BeforeClass
     public static void setup() throws Exception {
-
+        setup(true);
+    }
+    public static void setup(boolean failIfNoValidTokens) throws IOException, ApiRequestException, DataWrapperException {
         propertiesFile = null;
+
+        List<String> possibleFiles = new ArrayList<>();
+
 
         for(String path : propertiesPaths) {
             File parent = new File(path);
             File file = new File(parent, "test.properties");
+            possibleFiles.add(file.getAbsolutePath());
             if(file.exists() && file.isFile()&& file.canRead() && file.length() > 0) {
                 propertiesFile = file;
                 LOG.info("found test.properties at {}", file.getAbsolutePath());
@@ -54,7 +66,7 @@ public class ImgurEndpointTest {
         }
 
         if(propertiesFile == null) {
-            throw new IllegalStateException("Unable to find test.properties");
+            throw new IllegalStateException("Unable to find test.properties in " + possibleFiles);
         }
 
         PropertiesFileDataStoreConnector propertiesFileDataStoreConnector = new PropertiesFileDataStoreConnector(propertiesFile);
@@ -73,11 +85,21 @@ public class ImgurEndpointTest {
         user2ImgurUnderTest = new Imgur(data, user2Auth);
 
         if (!user1Auth.hasValidAccessToken()) {
-            getAndExchangePin(user1ImgurUnderTest, user1Auth, user1AuthData.getUsername());
+            if(failIfNoValidTokens) {
+                fail("User 1 does not have a valid access token");
+            } else {
+                LOG.info("User 1 does not have a valid access token");
+                getAndExchangePin(user1ImgurUnderTest, user1Auth, user1AuthData.getUsername());
+            }
         }
 
         if (!user2Auth.hasValidAccessToken()) {
-            getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
+            if(failIfNoValidTokens) {
+                fail("User 2 does not have a valid access token");
+            } else {
+                LOG.info("User 2 does not have a valid access token");
+                getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
+            }
         }
 
         getUser1ImgurUnderTest().auth.refreshToken();
@@ -115,7 +137,7 @@ public class ImgurEndpointTest {
     }
 
     public static void main(String[] args) throws Exception {
-        setup();
+        setup(false);
     }
 
     protected void pause(Logger logger, String s, long i) {
