@@ -11,6 +11,7 @@ import net.cromulence.imgur.apiv3.endpoints.CreditsEndpoint;
 import net.cromulence.imgur.apiv3.endpoints.GalleryEndpoint;
 import net.cromulence.imgur.apiv3.endpoints.ImageEndpoint;
 import net.cromulence.imgur.apiv3.endpoints.NotificationEndpoint;
+import net.cromulence.imgur.apiv3.endpoints.TagsEndpoint;
 import net.cromulence.imgur.apiv3.endpoints.TopicEndpoint;
 
 import javax.net.ssl.SSLContext;
@@ -31,6 +32,7 @@ public class Imgur {
     public final GalleryEndpoint gallery;
     public final ImageEndpoint image;
     public final NotificationEndpoint endpoint;
+    public final TagsEndpoint tags;
     public final TopicEndpoint topic;
 
     /**
@@ -93,7 +95,7 @@ public class Imgur {
         gallery = new GalleryEndpoint(this);
         image = new ImageEndpoint(this);
         endpoint = new NotificationEndpoint(this);
+        tags = new TagsEndpoint(this);
         topic = new TopicEndpoint(this);
-
     }
 }

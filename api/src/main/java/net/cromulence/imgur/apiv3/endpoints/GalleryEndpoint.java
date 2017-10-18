@@ -15,6 +15,7 @@ import net.cromulence.imgur.apiv3.datamodel.GalleryImage;
 import net.cromulence.imgur.apiv3.datamodel.GalleryImageImpl;
 import net.cromulence.imgur.apiv3.datamodel.Image;
 import net.cromulence.imgur.apiv3.datamodel.Tag;
+import net.cromulence.imgur.apiv3.datamodel.TagInfo;
 import net.cromulence.imgur.apiv3.datamodel.TagVote;
 import net.cromulence.imgur.apiv3.datamodel.Vote;
 import net.cromulence.imgur.apiv3.datamodel.constants.CommentSort;
@@ -140,7 +141,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public Tag getTagImages(String tagName, TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
-        String tagUrl = endpointUrlWithMultiplePathParameters(tagName, sort.toString(), window.toString(), page(page));
+        String tagUrl = endpointUrlWithMultiplePathParameters("t", tagName, sort.toString(), window.toString(), page(page));
 
         return getImgur().http.typedGet(tagUrl, Tag.class);
     }
@@ -167,6 +168,12 @@ public class GalleryEndpoint extends AbstractEndpoint {
         String voteUrl = endpointUrlWithMultiplePathParameters("tags", entryId);
 
         getImgur().http.post(voteUrl, getParamsFor("tags", Utils.asCommaSeparatedList(tagNames)), true);
+    }
+
+    public TagInfo getTagInfo(String tagName) throws ApiRequestException {
+        final String url = endpointUrlWithMultiplePathParameters("tag_info", tagName);
+
+        return getImgur().http.typedGet(url, TagInfo.class);
     }
 
     public Paginated<GalleryEntry[]> search(String searchString) {
