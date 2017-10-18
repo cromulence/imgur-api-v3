@@ -39,14 +39,14 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
 
         {
             // get new notifications for u1
-            Notifications initialNotificationsU1 = getUser1ImgurUnderTest().endpoint.getNotifications(true);
+            Notifications initialNotificationsU1 = getUser1ImgurUnderTest().notification.getNotifications(true);
 
             // confirm no notifications for u1
             assertEquals("Should be no message notifications", initialNotificationsU1.getMessages().length, 0);
             assertEquals("Should be no reply notifications", initialNotificationsU1.getReplies().length, 0);
 
             // get new notifications for u2
-            Notifications initialNotificationsU2 = getUser2ImgurUnderTest().endpoint.getNotifications(true);
+            Notifications initialNotificationsU2 = getUser2ImgurUnderTest().notification.getNotifications(true);
 
             // confirm no notifications for u2
             assertEquals("Should be no message notifications", initialNotificationsU2.getMessages().length, 0);
@@ -93,7 +93,7 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
 
         {
             // get u1 new notifications, confirm none for comment on post
-            Notifications afterComment1NotificationsU1 = getUser1ImgurUnderTest().endpoint.getNotifications(true);
+            Notifications afterComment1NotificationsU1 = getUser1ImgurUnderTest().notification.getNotifications(true);
             assertEquals("Should be no message notifications", 0, afterComment1NotificationsU1.getMessages().length);
             assertEquals("Should be no reply notifications", 0, afterComment1NotificationsU1.getReplies().length);
         }
@@ -106,7 +106,7 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
             pause(LOG, "Waiting for notification", 20000);
 
             // get u2 new notifications, should be a reply. confirm content and don't mark read
-            Notifications notificationsU2 = getUser2ImgurUnderTest().endpoint.getNotifications(true);
+            Notifications notificationsU2 = getUser2ImgurUnderTest().notification.getNotifications(true);
             assertEquals("Should be no message notifications", 0, notificationsU2.getMessages().length);
             assertEquals("Should be 1 reply notifications", 1, notificationsU2.getReplies().length);
 
@@ -137,23 +137,23 @@ public class CommentEndpointAndNotificationEndpointTest extends ImgurEndpointTes
 
         {
             // get u2 all notifications, should still be some unread
-            Notifications notificationsU2 = getUser2ImgurUnderTest().endpoint.getNotifications(true);
+            Notifications notificationsU2 = getUser2ImgurUnderTest().notification.getNotifications(true);
             assertEquals("Should be no message notifications", 0, notificationsU2.getMessages().length);
             assertEquals("Should be 1 reply notifications", 1, notificationsU2.getReplies().length);
 
             // get notification and confirm content
-            Notification<Comment> notification = getUser2ImgurUnderTest().endpoint.getCommentNotification(notificationsU2.getReplies()[0].getId());
+            Notification<Comment> notification = getUser2ImgurUnderTest().notification.getCommentNotification(notificationsU2.getReplies()[0].getId());
 
             Comment content = notification.getContent();
             assertEquals("comment should be as posted", ALICE_COMMENT, content.getComment());
 
             // mark read
-            getUser2ImgurUnderTest().endpoint.markRead(notificationsU2.getReplies()[0].getId());
+            getUser2ImgurUnderTest().notification.markRead(notificationsU2.getReplies()[0].getId());
         }
 
         {
             // get u2 new notifications, should be none
-            Notifications notificationsU2 = getUser2ImgurUnderTest().endpoint.getNotifications(true);
+            Notifications notificationsU2 = getUser2ImgurUnderTest().notification.getNotifications(true);
             assertEquals("Should be no message notifications", 0, notificationsU2.getMessages().length);
             assertEquals("Should be no reply notifications", 0, notificationsU2.getReplies().length);
         }

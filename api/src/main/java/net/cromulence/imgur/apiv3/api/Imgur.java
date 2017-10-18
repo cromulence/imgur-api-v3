@@ -31,7 +31,7 @@ public class Imgur {
     public final CreditsEndpoint credits;
     public final GalleryEndpoint gallery;
     public final ImageEndpoint image;
-    public final NotificationEndpoint endpoint;
+    public final NotificationEndpoint notification;
     public final TagsEndpoint tags;
     public final TopicEndpoint topic;
 
@@ -94,7 +94,7 @@ public class Imgur {
         credits = new CreditsEndpoint(this);
         gallery = new GalleryEndpoint(this);
         image = new ImageEndpoint(this);
-        endpoint = new NotificationEndpoint(this);
+        notification = new NotificationEndpoint(this);
         tags = new TagsEndpoint(this);
         topic = new TopicEndpoint(this);
     }
