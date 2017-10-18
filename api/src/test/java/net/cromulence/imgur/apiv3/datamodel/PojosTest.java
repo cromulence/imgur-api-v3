@@ -13,21 +13,48 @@ import com.openpojo.validation.test.impl.SetterTester;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PojosTest {
 
     // Configured for expectation, so we know when a class gets added or removed.
-    private static final int EXPECTED_CLASS_COUNT = 35;
+    private static final int EXPECTED_CLASS_COUNT = 36;
 
-    // The package to test
-    private static final String POJO_PACKAGE = "net.cromulence.imgur.apiv3.datamodel";
+    // The packages to test
+    private static final String DATAMODEL_PACKAGE = "net.cromulence.imgur.apiv3.datamodel";
+
+    private static final String CONSTANTS_PACKAGE = DATAMODEL_PACKAGE + ".constants";
+    private static final String MEME_PACKAGE      = DATAMODEL_PACKAGE + ".meme";
+    private static final String SUBREDDIT_PACKAGE = DATAMODEL_PACKAGE + ".subreddit";
+
+    private static final int EXPECTED_DATAMODEL_POJO_COUNT = 36;
+    private static final int EXPECTED_CONSTANTS_POJO_COUNT = 14;
+    private static final int EXPECTED_MEME_POJO_COUNT      = 6;
+    private static final int EXPECTED_SUBREDDIT_POJO_COUNT = 5;
 
     @Test
     public void ensureExpectedPojoCount() {
-        List<PojoClass> pojoClasses = PojoClassFactory.getPojoClasses(POJO_PACKAGE,
-            new FilterPackageInfo());
-        Affirm.affirmEquals("Classes added / removed?", EXPECTED_CLASS_COUNT, pojoClasses.size());
+
+        Affirm.affirmEquals(".datamodel classes added / removed?", EXPECTED_DATAMODEL_POJO_COUNT, getPojoClasses(DATAMODEL_PACKAGE).size());
+        Affirm.affirmEquals(".constants classes added / removed?", EXPECTED_CONSTANTS_POJO_COUNT, getPojoClasses(CONSTANTS_PACKAGE).size());
+        Affirm.affirmEquals(".meme classes added / removed?",      EXPECTED_MEME_POJO_COUNT, getPojoClasses(MEME_PACKAGE).size());
+        Affirm.affirmEquals(".subreddit classes added / removed?", EXPECTED_SUBREDDIT_POJO_COUNT, getPojoClasses(SUBREDDIT_PACKAGE).size());
+    }
+
+    private List<PojoClass> getAllClasses() {
+        List<PojoClass> pojoClasses = new ArrayList<>();
+
+        pojoClasses.addAll(getPojoClasses(DATAMODEL_PACKAGE));
+        pojoClasses.addAll(getPojoClasses(CONSTANTS_PACKAGE));
+        pojoClasses.addAll(getPojoClasses(MEME_PACKAGE));
+        pojoClasses.addAll(getPojoClasses(SUBREDDIT_PACKAGE));
+
+        return pojoClasses;
+    }
+
+    private List<PojoClass> getPojoClasses(String packageName) {
+        return PojoClassFactory.getPojoClasses(packageName, new FilterPackageInfo());
     }
 
     @Test
@@ -43,7 +70,7 @@ public class PojosTest {
             .with(new GetterTester())
             .build();
 
-        validator.validate(POJO_PACKAGE, new FilterPackageInfo());
+        validator.validate(getAllClasses());
     }
 
 }
