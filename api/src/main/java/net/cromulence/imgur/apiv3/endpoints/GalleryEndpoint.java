@@ -74,7 +74,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
         // window 	optional 	Change the date range of the request if the section is "top", day | week | month | year | all, defaults to day
         // showViral 	optional 	true | false - Show or hide viral images from the 'user' section. Defaults to true
 
-        String galleryUrl = endpointUrlWithMultiplePathParameters(section.toString(), sort.toString(), window.toString(), page(page));
+        String galleryUrl = endpointUrlWithMultiplePathParameters(section.toString(), sort.toString(), window.toString(), toPageParam(page));
         galleryUrl += "?showViral=" + showViral;
 
         return getImgur().http.typedGet(galleryUrl, GalleryEntry[].class, true);
@@ -90,7 +90,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
 
     public MemeEntry[] getMemes(TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
         // Memes exist in an endpoint called 'g' but are logically part of the gallery endpoint
-        final String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", sort.toString(), window.toString(), page(page));
+        final String memeUrl = baseUrlWithMultiplePathParameters("g", "memes", sort.toString(), window.toString(), toPageParam(page));
 
         return getImgur().http.typedGet(memeUrl, MemeEntry[].class);
     }
@@ -112,7 +112,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
 
     public SubredditEntry[] getSubredditGalleries(String subredditName, SubredditSort sort, GalleryWindow window, int page) throws ApiRequestException {
         // Subreddits exist in an endpoint called 'r' but are logically part of the gallery endpoint
-        final String subredditUrl = endpointUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), page(page));
+        final String subredditUrl = endpointUrlWithMultiplePathParameters("r", subredditName, sort.toString(), window.toString(), toPageParam(page));
 
         return getImgur().http.typedGet(subredditUrl, SubredditEntry[].class);
     }
@@ -141,7 +141,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public Tag getTagImages(String tagName, TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
-        String tagUrl = endpointUrlWithMultiplePathParameters("t", tagName, sort.toString(), window.toString(), page(page));
+        String tagUrl = endpointUrlWithMultiplePathParameters("t", tagName, sort.toString(), window.toString(), toPageParam(page));
 
         return getImgur().http.typedGet(tagUrl, Tag.class);
     }
@@ -186,7 +186,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
 
     public GalleryEntry[] search(String searchString, TopicSort sort, GalleryWindow window, int page) throws ApiRequestException {
         // This is basic search only ('q' parameter). The client is responsible for constructing a valid search string
-        String searchUrl = endpointUrlWithMultiplePathParameters("search", sort.toString(), window.toString(), page(page));
+        String searchUrl = endpointUrlWithMultiplePathParameters("search", sort.toString(), window.toString(), toPageParam(page));
         searchUrl += "?q=" + searchString;
 
         return getImgur().http.typedGet(searchUrl, GalleryEntry[].class);
@@ -197,7 +197,7 @@ public class GalleryEndpoint extends AbstractEndpoint {
     }
 
     public GalleryEntry[] random(int page) throws ApiRequestException {
-        String randomUrl = endpointUrlWithMultiplePathParameters("random", "random", page(page));
+        String randomUrl = endpointUrlWithMultiplePathParameters("random", "random", toPageParam(page));
 
         return getImgur().http.typedGet(randomUrl, GalleryEntry[].class);
     }
