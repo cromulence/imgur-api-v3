@@ -30,7 +30,7 @@ public class CustomGalleryEndpoint extends AbstractEndpoint {
     }
 
     public CustomGallery getCustomGallery(GallerySort sort, GalleryWindow window, int page) throws ApiRequestException {
-        String customGalleryUrl = endpointUrlWithMultiplePathParameters(CUSTOM, sort.toString(), window.toString(), page(page));
+        String customGalleryUrl = endpointUrlWithMultiplePathParameters(CUSTOM, sort.toString(), window.toString(), toPageParam(page));
 
         return getImgur().http.typedGet(customGalleryUrl, CustomGallery.class);
     }

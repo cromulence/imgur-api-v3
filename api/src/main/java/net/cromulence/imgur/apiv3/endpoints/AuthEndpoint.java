@@ -30,6 +30,7 @@ public class AuthEndpoint extends AbstractEndpoint {
 
     @Override
     public String getEndpointUrl() {
+        // The OAuth endpoint isn't part of the v3 URL space
         return String.format("%s/%s", BASE_API_URL, getEndpointName());
     }
 
@@ -62,12 +63,13 @@ public class AuthEndpoint extends AbstractEndpoint {
         return doToken(authParams(AuthResponseType.REFRESH_TOKEN, "refresh_token", getImgur().authHandler.getRefreshToken()));
     }
 
-    protected boolean doToken(List<NameValuePair> params) throws IOException, ApiRequestException {
+    private boolean doToken(List<NameValuePair> params) throws IOException, ApiRequestException {
         final String refreshUrl = endpointUrlWithSinglePathParameter("token");
 
         final AuthResponse auth = getImgur().http.auth(refreshUrl, params, true);
 
-        LOG.debug("doToken: got auth response accessToken[" + auth.getAccessToken() + "] refreshToken[" + auth.getRefreshToken() + "] expiresIn[" + auth.getExpiresIn() + "]");
+        LOG.debug("doToken: got auth response accessToken[{}] refreshToken[{}] expiresIn[{}]",
+            auth.getAccessToken(), auth.getRefreshToken(), auth.getExpiresIn());
 
         getImgur().authHandler.handleAuth(auth);
 

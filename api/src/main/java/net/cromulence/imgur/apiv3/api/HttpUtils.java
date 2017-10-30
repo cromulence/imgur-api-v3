@@ -458,6 +458,10 @@ public class HttpUtils implements HttpInspector {
             // If we have no higher-level error, just use the HTTP status in the response
             getExceptionFromStatusCode(url, response.getStatus());
         } else {
+            if(response.getStatus() == 404) {
+                throw new NotFoundException(error.getErrorDetails().getMessage());
+            }
+
             if ("User Previously Verified".equals(error.getErrorDetails().getMessage())) {
                 // No exception needed here
                 return;

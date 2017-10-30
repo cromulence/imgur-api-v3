@@ -61,7 +61,7 @@ public abstract class AbstractEndpoint {
 
     protected abstract String getEndpointName();
 
-    protected String page(int page) {
+    protected String toPageParam(int page) {
         if (page > -1) {
             return Integer.toString(page);
         }
