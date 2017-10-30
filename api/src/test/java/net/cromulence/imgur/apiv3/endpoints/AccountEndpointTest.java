@@ -103,7 +103,7 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testPaginatedGalleryFavourites() throws ApiRequestException {
-        Paginated<GalleryEntry[]> galleryFavourites = getUser1ImgurUnderTest().account.getGalleryFavourites();
+        Paginated<GalleryEntry[]> galleryFavourites = getUser1ImgurUnderTest().account.getAccountGalleryFavourites();
 
         GalleryEntry[] next;
 
