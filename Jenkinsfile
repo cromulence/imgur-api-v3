@@ -16,27 +16,47 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
                     withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
-                        withGradle {
-                           sh "./gradlew --debug --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
-                       }
-                   }
-               }
-           }
-        }
+                        script {
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
-                        withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
-                            withGradle {
-                               sh "./gradlew --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} test"
-                           }
-                       }
-                   }
-               }
+                            docker
+                                .image("gradle")
+                                .run(""
+                                	+ "--rm "
+                                	+ "-u gradle "
+                                	+ "-v \"$PWD\":/home/gradle/project "
+                                	+ "-w /home/gradle/project "
+                                	+ "gradle "
+                            	    + (""
+                            	        + "--debug " 
+                                	    + "--no-daemon " 
+                                	    + "-PgitCommit=${COMMIT_HASH} " 
+                                	    + "-PjenkinsBuild=${JENKINS_BUILD} " 
+                                	    + "clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
+                                	)
+                                )
+
+                           //  withGradle {
+                           //     sh "./gradlew --debug --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
+                           // }
+                        }
+                    }
+                }
             }
         }
+
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+        //                 withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
+        //                     withGradle {
+        //                        sh "./gradlew --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} test"
+        //                    }
+        //                }
+        //            }
+        //        }
+        //     }
+        // }
 
         stage('Publish') {
             steps {
