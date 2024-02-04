@@ -3,27 +3,25 @@ buildscript {
         mavenLocal()
         jcenter()
         mavenCentral()
-        maven {
-            url  "http://dl.bintray.com/cromulence/maven"
-        }
-    }
-    dependencies {
-        classpath "net.cromulence.buildsystem.gradle:travis-bintray:+"
-        classpath 'com.palantir:jacoco-coverage:0.4.0'
     }
 }
 
-apply plugin: 'com.palantir.jacoco-full-report'
+//plugins loaded from special gradle plugin repo...
+plugins {
+    //google "gradle build scan" or https://github.com/gradle/gradle-build-scan-quickstart
+    // essentially, ./gradlew build -Dscan
+    id 'com.gradle.build-scan' version '1.0' //google "gradle build scan"
+    id "maven-publish"
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.2.1"
+}
+
 apply from: 'dependencies.gradle'
 
 allprojects {
-
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
-    apply plugin: 'travis-bintray'
-    apply plugin: 'maven'
     apply plugin: 'jacoco'
 
     //apply plugin: 'nebula.lint'
@@ -35,9 +33,6 @@ allprojects {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            url  "http://dl.bintray.com/cromulence/maven"
-        }
     }
 
     checkstyle {
