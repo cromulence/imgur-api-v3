@@ -127,6 +127,6 @@ configurations {
     published
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.12'
+wrapper {
+    gradleVersion = '7.6'
 }
