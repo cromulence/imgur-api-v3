@@ -17,6 +17,7 @@ plugins {
     id 'com.gradle.build-scan' version '1.0' //google "gradle build scan"
     id "maven-publish"
     id "com.google.cloud.artifactregistry.gradle-plugin" version "2.2.1"
+    id 'jacoco'
 }
 
 publishing {
@@ -34,7 +35,6 @@ allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
-    apply plugin: 'jacoco'
     apply plugin: 'maven-publish'
     apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
 
@@ -113,7 +113,13 @@ subprojects {
             // showStandardStreams = true        // Show console output from the running tests
 
         }
+        finalizedBy jacocoTestReport // report is always generated after tests run
     }
+
+    jacocoTestReport {
+        dependsOn test // tests are required to run before generating the report
+    }
+
     // if(System.env['JAVA_HOME'] == null){
     //     throw new GradleException('JAVA_HOME not set')
     // }
@@ -152,13 +158,6 @@ task codeCoverageReport(type: JacocoReport) {
         html.enabled true
         csv.enabled true
     }
-}
-
-task jacocoMerge(type: JacocoMerge) {
-    dependsOn(subprojects.jacocoTestReport.dependsOn)
-    mustRunAfter(subprojects.jacocoTestReport.mustRunAfter)
-    destinationFile = file("${buildDir}/jacoco/test.exec")
-    executionData = files(subprojects.jacocoTestReport.executionData).filter { f -> f.exists() }
 }
 
 codeCoverageReport.dependsOn {
