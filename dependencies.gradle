@@ -1,4 +1,4 @@
-ext.datawrapperVersion = "0.9"
+ext.datawrapperVersion = "0.14"
 
 ext.libs = [
         datawrapperApi:        "net.cromulence.datawrapper:datawrapper-api:${ext.datawrapperVersion}",
