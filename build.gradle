@@ -1,8 +1,12 @@
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
         mavenCentral()
+    }
+
+    dependencies {
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+        classpath 'gradle.plugin.co.riiid:gradle-github-plugin:0.4.2'   
     }
 }
 
@@ -15,6 +19,14 @@ plugins {
     id "com.google.cloud.artifactregistry.gradle-plugin" version "2.2.1"
 }
 
+publishing {
+  repositories {
+    maven {
+      url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+    }
+  }
+}
+
 apply from: 'dependencies.gradle'
 
 allprojects {
@@ -23,6 +35,8 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
     apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
+    apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
 
     //apply plugin: 'nebula.lint'
 
@@ -33,6 +47,9 @@ allprojects {
     repositories {
         mavenLocal()
         jcenter()
+        maven {
+          url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+        }
     }
 
     checkstyle {
@@ -43,8 +60,8 @@ allprojects {
 
 subprojects {
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 
     project.version = rootProject.version
 
@@ -92,35 +109,57 @@ subprojects {
 
         }
     }
-    if(System.env['JAVA_HOME'] == null){
-        throw new GradleException('JAVA_HOME not set')
+    // if(System.env['JAVA_HOME'] == null){
+    //     throw new GradleException('JAVA_HOME not set')
+    // }
+
+    if (project.plugins.hasPlugin('java')) {
+        configurations {
+            published
+        }
     }
+
+    publishing {
+        publications {
+            myPublication(MavenPublication) {
+                from components.java
+                artifact sourceJar
+            }
+        }
+    }
+
+}
+
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+  archiveClassifier = "sources"
 }
 
 task codeCoverageReport(type: JacocoReport) {
-  executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+    executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
-  subprojects.each {
-    sourceSets it.sourceSets.main
-  }
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
 
-  reports {
-    xml.enabled true
-    //xml.destination "${buildDir}/reports/jacoco/report.xml"
-    html.enabled true
-    csv.enabled true
-  }
+    reports {
+        xml.enabled true
+        //xml.destination "${buildDir}/reports/jacoco/report.xml"
+        html.enabled true
+        csv.enabled true
+    }
 }
 
 task jacocoMerge(type: JacocoMerge) {
-  dependsOn(subprojects.jacocoTestReport.dependsOn)
-  mustRunAfter(subprojects.jacocoTestReport.mustRunAfter)
-  destinationFile = file("${buildDir}/jacoco/test.exec")
-  executionData = files(subprojects.jacocoTestReport.executionData).filter { f -> f.exists() }
+    dependsOn(subprojects.jacocoTestReport.dependsOn)
+    mustRunAfter(subprojects.jacocoTestReport.mustRunAfter)
+    destinationFile = file("${buildDir}/jacoco/test.exec")
+    executionData = files(subprojects.jacocoTestReport.executionData).filter { f -> f.exists() }
 }
 
 codeCoverageReport.dependsOn {
-  subprojects*.test
+    subprojects*.test
 }
 
 configurations {
