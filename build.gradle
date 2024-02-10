@@ -65,6 +65,10 @@ subprojects {
 
     project.version = rootProject.version
 
+    java {
+        withSourcesJar()
+    }
+
     compileJava {
         options.debug = true
         options.debugOptions.debugLevel = "source,lines,vars"
@@ -123,7 +127,6 @@ subprojects {
         publications {
             myPublication(MavenPublication) {
                 from components.java
-                artifact sourceJar
             }
         }
     }
