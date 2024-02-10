@@ -31,7 +31,7 @@ pipeline {
                                 	    + "--no-daemon " 
                                 	    + "-PgitCommit=${COMMIT_HASH} " 
                                 	    + "-PjenkinsBuild=${JENKINS_BUILD} " 
-                                	+ "clean check jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate test publish"                                	
+                                	+ "clean check test jacocoFullReport generatePomFileForMavenPublication copyBintrayTemplate publish" 	
                                 )
 
                            //  withGradle {
