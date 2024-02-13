@@ -1,3 +1,5 @@
+def container
+
 pipeline {
     agent any
 
@@ -18,7 +20,7 @@ pipeline {
                     withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
                         script {
 
-                            def container = docker
+                            container = docker
                                 .image("gradle:7.6.4-jdk11")
                                 .run(""
                                 	+ "-u gradle "
@@ -32,10 +34,8 @@ pipeline {
                                 	+ "clean check test jacocoTestReport generatePomFileForMavenPublication copyBintrayTemplate publish" 	
                                 )
 
-                            sh "echo test container exit code \$(docker wait ${testContainer.id})"
-                            sh "exit \$(docker wait ${testContainer.id})"
-
-                            sh "docker logs ${container.id}"
+                            sh "echo test container exit code \$(docker wait ${container.id})"
+                            sh "exit \$(docker wait ${container.id})"
 
                            //  withGradle {
                            //     sh "./gradlew --debug --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
@@ -73,5 +73,13 @@ pipeline {
         //         }
         //     }
         // }
+    }
+
+    post {
+        failure {
+            script {
+                sh "docker logs ${container.id}"
+            }
+        }
     }
 }
