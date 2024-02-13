@@ -18,21 +18,23 @@ pipeline {
                     withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
                         script {
 
-                            docker
-                                .image("gradle")
+                            def container = docker
+                                .image("gradle:7.6.4-jdk11")
                                 .run(""
-                                	+ "--rm "
                                 	+ "-u gradle "
-                                	+ "-v \"$PWD\":/home/gradle/project "
-                                	+ "-w /home/gradle/project "
-                                	+ "gradle "
-                            	    + (""
+                                	+ "-v \"${env.WORKSPACE}:/home/gradle/project\" "
+                                	+ "-w /home/gradle/project ",                                
+                                	"gradle "
                             	        + "--debug " 
                                 	    + "--no-daemon " 
                                 	    + "-PgitCommit=${COMMIT_HASH} " 
                                 	    + "-PjenkinsBuild=${JENKINS_BUILD} " 
-                                	+ "clean check test jacocoFullReport generatePomFileForMavenPublication copyBintrayTemplate publish" 	
+                                	+ "clean check test jacocoTestReport generatePomFileForMavenPublication copyBintrayTemplate publish" 	
                                 )
+
+                            sh "docker wait ${container.id}"
+
+                            sh "docker logs ${container.id}"
 
                            //  withGradle {
                            //     sh "./gradlew --debug --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
@@ -57,18 +59,18 @@ pipeline {
         //     }
         // }
 
-        stage('Publish') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
-                        withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
-                            withGradle {
-                                sh "./gradlew --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} publish"
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Publish') {
+        //     steps {
+        //         script {
+        //             withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+        //                 withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
+        //                     withGradle {
+        //                         sh "./gradlew --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} publish"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 }
