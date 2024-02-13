@@ -25,14 +25,15 @@ pipeline {
                                 	+ "-v \"${env.WORKSPACE}:/home/gradle/project\" "
                                 	+ "-w /home/gradle/project ",                                
                                 	"gradle "
-                            	        + "--debug " 
-                                	    + "--no-daemon " 
-                                	    + "-PgitCommit=${COMMIT_HASH} " 
-                                	    + "-PjenkinsBuild=${JENKINS_BUILD} " 
+                            	    + "--debug "  
+                                	+ "--no-daemon " 
+                                	+ "-PgitCommit=${COMMIT_HASH} " 
+                                	+ "-PjenkinsBuild=${JENKINS_BUILD} " 
                                 	+ "clean check test jacocoTestReport generatePomFileForMavenPublication copyBintrayTemplate publish" 	
                                 )
 
-                            sh "docker wait ${container.id}"
+                            sh "echo test container exit code \$(docker wait ${testContainer.id})"
+                            sh "exit \$(docker wait ${testContainer.id})"
 
                             sh "docker logs ${container.id}"
 
