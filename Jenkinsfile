@@ -1,50 +1,104 @@
 def container
 
-pipeline {
-    agent any
+def dockerArgs
+def gradleArgs
 
-    environment {
-        BRANCH        = "${env.BRANCH_NAME}"
-        COMMIT_HASH   = "${env.GIT_COMMIT}"
-        JENKINS_BUILD = "${env.GIT_COMMIT}"
+pipeline {
+  agent any
+
+  environment {
+    BRANCH        = "${env.BRANCH_NAME}"
+    COMMIT_HASH   = "${env.GIT_COMMIT}"
+    JENKINS_BUILD = "${env.GIT_COMMIT}"
 
         gcpKeyId       = 'cromulence-srvcacc-jsonAccessKey'
-        gcpProjectName = "cromulence"
-        garRegion      = "europe-west2"
+
+    gcpKeyId       = 'cromulence-srvcacc-jsonAccessKey'
+    gcpProjectName = "cromulence"
+    garRegion      = "europe-west2"
+  }
+
+  stages {
+    stage('Setup project') {
+      steps {
+        script {
+          dockerArgs = [
+            "--privileged=true ",
+            "--user root ",
+            "--volumes-from jenkins-worker-a-1 ",
+            "-w ${env.WORKSPACE} "
+          ].join(" ")
+          gradleArgs = [                                
+            "gradle ",
+            "--stacktrace ",
+            "--no-daemon ",
+            "-PgitCommit=${COMMIT_HASH} " ,
+            "-PjenkinsBuild=${JENKINS_BUILD} "
+          ].join(" ")
+        }
+      }
     }
 
-    stages {
-        stage('Build project') {
-            steps {
-                withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
-                    withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
-                        script {
-
-                            container = docker
-                                .image("gradle:7.6.4-jdk11")
-                                .run(""
-                                	+ "-u gradle "
-                                	+ "-v \"${env.WORKSPACE}:/home/gradle/project\" "
-                                	+ "-w /home/gradle/project ",                                
-                                	"gradle "
-                            	    + "--debug "  
-                                	+ "--no-daemon " 
-                                	+ "-PgitCommit=${COMMIT_HASH} " 
-                                	+ "-PjenkinsBuild=${JENKINS_BUILD} " 
-                                	+ "clean check test jacocoTestReport generatePomFileForMavenPublication copyBintrayTemplate publish" 	
-                                )
-
-                            sh "echo test container exit code \$(docker wait ${container.id})"
-                            sh "exit \$(docker wait ${container.id})"
-
-                           //  withGradle {
-                           //     sh "./gradlew --debug --no-daemon -PgitCommit=${COMMIT_HASH} -PjenkinsBuild=${JENKINS_BUILD} clean check sourceJar javadocJar jacocoFullReport jacocoMerge generatePomFileForMavenPublication copyBintrayTemplate"
-                           // }
-                        }
-                    }
-                }
+    stage('Build project') {
+      steps {
+        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+          withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
+            script {
+              container = docker
+                .image("gradle:7.6.4-jdk11")
+                .run(
+                  dockerArgs,
+                  gradleArgs + " clean check build"    
+                )
+              sh "echo test container exit code \$(docker wait ${container.id})"
+              sh "exit \$(docker wait ${container.id})"
             }
+          }
         }
+      }
+    }
+ 
+    stage('Test project') {
+      steps {
+        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+          withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
+            script {
+
+
+              container = docker
+                .image("gradle:7.6.4-jdk11")
+                .run(
+                  dockerArgs,
+                  gradleArgs + " test jacocoTestReport"    
+                )
+
+              sh "echo test container exit code \$(docker wait ${container.id})"
+              sh "exit \$(docker wait ${container.id})"
+            }
+          }
+        }
+      }
+    }
+
+    stage('Publish project') {
+      steps {
+        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+          withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
+            script {
+              container = docker
+                .image("gradle:7.6.4-jdk11")
+                .run(
+                  dockerArgs,
+                  gradleArgs + " publish"    
+                )
+
+              sh "echo test container exit code \$(docker wait ${container.id})"
+              sh "exit \$(docker wait ${container.id})"
+            }
+          }
+        }
+      }
+    }
 
         // stage('Run Tests') {
         //     steps {
