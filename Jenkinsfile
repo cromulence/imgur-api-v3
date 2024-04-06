@@ -11,8 +11,6 @@ pipeline {
     COMMIT_HASH   = "${env.GIT_COMMIT}"
     JENKINS_BUILD = "${env.GIT_COMMIT}"
 
-        gcpKeyId       = 'cromulence-srvcacc-jsonAccessKey'
-
     gcpKeyId       = 'cromulence-srvcacc-jsonAccessKey'
     gcpProjectName = "cromulence"
     garRegion      = "europe-west2"
