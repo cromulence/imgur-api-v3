@@ -20,11 +20,9 @@ plugins {
     id 'jacoco'
 }
 
-publishing {
-  repositories {
-    maven {
-      url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
-    }
+repositories {
+  maven {
+    url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
   }
 }
 
@@ -46,9 +44,9 @@ allprojects {
 
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
         maven {
-          url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+            url  "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
         }
     }
 
@@ -131,11 +129,18 @@ subprojects {
     }
 
     publishing {
-        publications {
-            myPublication(MavenPublication) {
-                from components.java
-            }
+      repositories {
+        maven {
+          url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
         }
+      }
+
+      publications {
+        mavenJava(MavenPublication) {
+          groupId  gavGroup
+          from components.java
+        }
+      }
     }
 
 }
