@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
+import junit.framework.TestCase;
 import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 import net.cromulence.imgur.apiv3.datamodel.AccountSettings;
 import net.cromulence.imgur.apiv3.datamodel.GalleryEntry;
@@ -89,9 +90,9 @@ public class AccountEndpointTest extends ImgurEndpointTest {
         Trophy[] trophies = galleryProfile.getTrophies();
 
         assertTrue("should be some of comments", totalGalleryComments > 10);
-        assertTrue("should be lots of favs", totalGalleryFavorites > 100);
-        assertTrue("should be no submissions", totalGallerySubmissions == 0);
-        assertTrue("should be no trophies", trophies.length == 0);
+        assertTrue("should be lots of favourites", totalGalleryFavorites > 100);
+        TestCase.assertEquals("should be no submissions", 0, totalGallerySubmissions);
+        TestCase.assertEquals("should be no trophies", 0, trophies.length);
     }
 
     @Test
@@ -103,9 +104,9 @@ public class AccountEndpointTest extends ImgurEndpointTest {
 
     @Test
     public void testPaginatedGalleryFavourites() throws ApiRequestException {
-        Paginated<GalleryEntry[]> galleryFavourites = getUser1ImgurUnderTest().account.getAccountGalleryFavourites();
+        Paginated<GalleryEntry<?>[]> galleryFavourites = getUser1ImgurUnderTest().account.getAccountGalleryFavourites();
 
-        GalleryEntry[] next;
+        GalleryEntry<?>[] next;
 
         do {
             next = galleryFavourites.next();

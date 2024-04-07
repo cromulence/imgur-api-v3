@@ -1,9 +1,6 @@
 package net.cromulence.imgur.apiv3.endpoints;
 
-import static junit.framework.TestCase.fail;
-
 import com.google.gson.GsonBuilder;
-
 import net.cromulence.datawrapper.DataWrapper;
 import net.cromulence.datawrapper.DataWrapperException;
 import net.cromulence.datawrapper.DataWrapperImpl;
@@ -14,7 +11,6 @@ import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthData;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.auth.PersistingOAuthHandler;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -26,11 +22,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+
+import static junit.framework.TestCase.fail;
 
 public class ImgurEndpointTest {
 
-    private static Logger LOG = LoggerFactory.getLogger(ImgurEndpointTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImgurEndpointTest.class);
 
     private static File propertiesFile;
 
@@ -48,7 +45,7 @@ public class ImgurEndpointTest {
     public static void setup() throws Exception {
         setup(true);
     }
-    public static void setup(boolean failIfNoValidTokens) throws IOException, ApiRequestException, DataWrapperException {
+    public static void setup(boolean failIfNoValidTokens) throws IOException, ApiRequestException, DataWrapperException, DataWrapperException {
         propertiesFile = null;
 
         List<String> possibleFiles = new ArrayList<>();

@@ -10,7 +10,6 @@ import com.openpojo.validation.rule.impl.GetterMustExistRule;
 import com.openpojo.validation.rule.impl.SetterMustExistRule;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class PojosTest {
     }
 
     private List<PojoClass> getAllClasses() {
-        List<PojoClass> pojoClasses = new ArrayList<>();
+        ArrayList<PojoClass> pojoClasses = new ArrayList<>();
 
         pojoClasses.addAll(getPojoClasses(DATAMODEL_PACKAGE));
         pojoClasses.addAll(getPojoClasses(CONSTANTS_PACKAGE));

@@ -104,16 +104,16 @@ public class HttpUtils implements HttpInspector {
     private final List<HttpInspector> httpInspectors = new ArrayList<>();
 
     // Custom JSON deserializers
-    private final JsonDeserializer imageDeserializer = new ImageDeserializer();
-    private final JsonDeserializer albumDeserializer = new AlbumDeserializer();
-    private final JsonDeserializer galleryDeserializer = new GalleryDeserializer();
-    private final JsonDeserializer galleryEntryDeserializer = new GalleryEntryDeserializer();
-    private final JsonDeserializer notifiableDeserializer = new NotifiableDeserializer();
-    private final JsonDeserializer apiErrorJsonDeserializer = new ApiErrorJsonDeserializer();
-    private final JsonDeserializer commentArrayJsonDeserializer = new CommentArrayJsonDeserializer();
-    private final JsonDeserializer stringArrayJsonDeserializer = new StringArrayJsonDeserializer();
-    private final JsonDeserializer memeEntryDeserializer = new MemeEntryDeserializer();
-    private final JsonDeserializer subredditEntryDeserializer = new SubredditEntryDeserializer();
+    private final JsonDeserializer<?> imageDeserializer = new ImageDeserializer();
+    private final JsonDeserializer<?> albumDeserializer = new AlbumDeserializer();
+    private final JsonDeserializer<?> galleryDeserializer = new GalleryDeserializer();
+    private final JsonDeserializer<?> galleryEntryDeserializer = new GalleryEntryDeserializer();
+    private final JsonDeserializer<?> notifiableDeserializer = new NotifiableDeserializer();
+    private final JsonDeserializer<?> apiErrorJsonDeserializer = new ApiErrorJsonDeserializer();
+    private final JsonDeserializer<?> commentArrayJsonDeserializer = new CommentArrayJsonDeserializer();
+    private final JsonDeserializer<?> stringArrayJsonDeserializer = new StringArrayJsonDeserializer();
+    private final JsonDeserializer<?> memeEntryDeserializer = new MemeEntryDeserializer();
+    private final JsonDeserializer<?> subredditEntryDeserializer = new SubredditEntryDeserializer();
 
     HttpUtils(Imgur imgur) {
         this(imgur, HttpClients.createDefault());
@@ -164,6 +164,10 @@ public class HttpUtils implements HttpInspector {
 
     /**
      * Perform a HTTP request for an initial auth request (logging in)
+     * @param url Where to send the request to
+     * @param params Login info
+     * @return Auth response
+     * @throws ApiRequestException On any issue with the rest api
      */
     public AuthResponse initialAuth(String url, List<NameValuePair> params) throws ApiRequestException {
         return auth(url, params, false);
@@ -171,6 +175,10 @@ public class HttpUtils implements HttpInspector {
 
     /**
      * Perform a HTTP request for an auth request
+     * @param url Where to send the request to
+     * @param params Login info
+     * @param authenticated Is this an authenticated request
+     * @return Auth response
      */
     public AuthResponse auth(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         final ApiResponse apiResponse = rawPost(url, params, authenticated);
@@ -184,7 +192,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url) throws ApiRequestException {
+    public BasicResponse<?> post(String url) throws ApiRequestException {
         return post(url, true);
     }
 
@@ -196,7 +204,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url, List<NameValuePair> params) throws ApiRequestException {
+    public BasicResponse<?> post(String url, List<NameValuePair> params) throws ApiRequestException {
         return post(url, params, true);
     }
 
@@ -208,7 +216,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url, boolean authenticated) throws ApiRequestException {
+    public BasicResponse<?> post(String url, boolean authenticated) throws ApiRequestException {
         return post(url, null, authenticated);
     }
 
@@ -221,7 +229,7 @@ public class HttpUtils implements HttpInspector {
      * @throws ApiRequestException If there is a problem with the request
      * @throws ImgurApiTimeoutException If a response is not received in a timely fashion
      */
-    public BasicResponse post(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
+    public BasicResponse<?> post(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         ApiResponse postResponse = rawPost(url, params, authenticated);
 
         return handleApiResponse(url, postResponse);
@@ -250,7 +258,7 @@ public class HttpUtils implements HttpInspector {
     }
 
     public <T> T typedPost(String url, TypeToken<T> type, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
-        BasicResponse postResponse = post(url, params, authenticated);
+        BasicResponse<?> postResponse = post(url, params, authenticated);
 
         return typeResponse(postResponse, type);
     }
@@ -263,21 +271,21 @@ public class HttpUtils implements HttpInspector {
         return typedPost(url, TypeToken.get(clazz), params, authenticated);
     }
 
-    public BasicResponse get(String url) throws ApiRequestException {
+    public BasicResponse<?> get(String url) throws ApiRequestException {
         return get(url, true);
     }
 
-    private BasicResponse get(String url, boolean authenticated) throws ApiRequestException {
+    private BasicResponse<?> get(String url, boolean authenticated) throws ApiRequestException {
         ApiResponse getResponse = rawGet(url, authenticated);
 
         return handleApiResponse(url, getResponse);
     }
 
-    private BasicResponse handleApiResponse(String url, ApiResponse apiResponse) throws ApiRequestException {
+    private BasicResponse<?> handleApiResponse(String url, ApiResponse apiResponse) throws ApiRequestException {
         if(!apiResponse.isSuccess()) {
 
             try {
-                BasicResponse response = getAsBasicResponse(apiResponse);
+                BasicResponse<?> response = getAsBasicResponse(apiResponse);
 
                 if (!response.isSuccess()) {
                     // Throw the appropriate exception
@@ -295,7 +303,7 @@ public class HttpUtils implements HttpInspector {
             }
         }
 
-        BasicResponse response = getAsBasicResponse(apiResponse);
+        BasicResponse<?> response = getAsBasicResponse(apiResponse);
 
         if (!response.isSuccess()) {
             // Throw the appropriate exception
@@ -306,29 +314,29 @@ public class HttpUtils implements HttpInspector {
         return response;
     }
 
-    public BasicResponse delete(String url) throws ApiRequestException {
+    public BasicResponse<?> delete(String url) throws ApiRequestException {
         return delete(url, null, true);
     }
 
-    public BasicResponse delete(String url, boolean authenticated) throws ApiRequestException {
+    public BasicResponse<?> delete(String url, boolean authenticated) throws ApiRequestException {
         return delete(url, null, authenticated);
     }
 
-    public BasicResponse delete(String url, List<NameValuePair> params) throws ApiRequestException {
+    public BasicResponse<?> delete(String url, List<NameValuePair> params) throws ApiRequestException {
         return delete(url, params, true);
     }
 
-    public BasicResponse delete(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
+    public BasicResponse<?> delete(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         ApiResponse deleteResponse = rawDelete(url, params, authenticated);
 
         return handleApiResponse(url, deleteResponse);
     }
 
-    public BasicResponse put(String url, List<NameValuePair> params) throws ApiRequestException {
+    public BasicResponse<?> put(String url, List<NameValuePair> params) throws ApiRequestException {
         return put(url, params, true);
     }
 
-    public BasicResponse put(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
+    public BasicResponse<?> put(String url, List<NameValuePair> params, boolean authenticated) throws ApiRequestException {
         ApiResponse putResponse = rawPut(url, params, authenticated);
 
         return handleApiResponse(url, putResponse);
@@ -407,7 +415,7 @@ public class HttpUtils implements HttpInspector {
                     LOG.debug("typedGet reattempt {}", attempt);
                 }
 
-                BasicResponse getResponse = get(url, authenticated);
+                BasicResponse<?> getResponse = get(url, authenticated);
 
                 return typeResponse(getResponse, type);
             } catch (ImgurApiTimeoutException | ImgurServerException e) {
@@ -448,7 +456,7 @@ public class HttpUtils implements HttpInspector {
         }
     }
 
-    private void getExceptionFromErrorResponse(String url, BasicResponse response) throws ApiRequestException {
+    private void getExceptionFromErrorResponse(String url, BasicResponse<?> response) throws ApiRequestException {
 
         // Identify common errors in here and throw more accurate exceptions
         final String responseData = complexGson.toJson(response.getData());
@@ -479,8 +487,8 @@ public class HttpUtils implements HttpInspector {
         throw new ErrorResponseException(response.getStatus(), error);
     }
 
-    private BasicResponse getAsBasicResponse(ApiResponse response) throws ResponseTypeException {
-        BasicResponse fromJson;
+    private BasicResponse<?> getAsBasicResponse(ApiResponse response) throws ResponseTypeException {
+        BasicResponse<?> fromJson;
         try {
             fromJson = complexGson.fromJson(response.getResponseBody(), BasicResponse.class);
         } catch (JsonSyntaxException e) {
@@ -501,7 +509,7 @@ public class HttpUtils implements HttpInspector {
      * @return Instance of T
      * @throws ResponseTypeException If casting to the specified type fails
      */
-    private <T> T typeResponse(BasicResponse response, TypeToken<T> type) throws ResponseTypeException {
+    private <T> T typeResponse(BasicResponse<?> response, TypeToken<T> type) throws ResponseTypeException {
         final String responseData = complexGson.toJson(response.getData());
 
         try {
@@ -666,7 +674,7 @@ public class HttpUtils implements HttpInspector {
         }
     }
 
-    private class GalleryEntryDeserializer implements JsonDeserializer<GalleryEntry> {
+    private static class GalleryEntryDeserializer implements JsonDeserializer<GalleryEntry> {
 
         @Override
         public GalleryEntry deserialize(JsonElement json,
@@ -743,7 +751,7 @@ public class HttpUtils implements HttpInspector {
         }
     }
 
-    private class StringArrayJsonDeserializer implements JsonDeserializer<String[]> {
+    private static class StringArrayJsonDeserializer implements JsonDeserializer<String[]> {
         @Override
         public String[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
 
@@ -769,14 +777,14 @@ public class HttpUtils implements HttpInspector {
                 }
             }
 
-            return toReturn.toArray(new String[toReturn.size()]);
+            return toReturn.toArray(new String[0]);
         }
     }
 
-    private class MemeEntryDeserializer implements JsonDeserializer<MemeEntry> {
+    private static class MemeEntryDeserializer implements JsonDeserializer<MemeEntry<?>> {
 
         @Override
-        public MemeEntry deserialize(JsonElement json,
+        public MemeEntry<?> deserialize(JsonElement json,
             Type typeOfT, JsonDeserializationContext context) {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);
@@ -798,10 +806,10 @@ public class HttpUtils implements HttpInspector {
         }
     }
 
-    private class SubredditEntryDeserializer implements JsonDeserializer<SubredditEntry> {
+    private static class SubredditEntryDeserializer implements JsonDeserializer<SubredditEntry<?>> {
 
         @Override
-        public SubredditEntry deserialize(JsonElement json,
+        public SubredditEntry<?> deserialize(JsonElement json,
             Type typeOfT, JsonDeserializationContext context) {
 
             GalleryDetails gd = context.deserialize(json, GalleryDetailsImpl.class);

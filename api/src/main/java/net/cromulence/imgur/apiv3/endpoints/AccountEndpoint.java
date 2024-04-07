@@ -51,56 +51,56 @@ public class AccountEndpoint extends AbstractEndpoint {
         return getImgur().http.typedGet(infoUrl, Account.class, true);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites() {
+    public Paginated<GalleryEntry<?>[]> getAccountGalleryFavourites() {
         return getAccountGalleryFavourites(ME, FavoriteSort.NEWEST);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(FavoriteSort sort) {
+    public Paginated<GalleryEntry<?>[]> getAccountGalleryFavourites(FavoriteSort sort) {
         return getAccountGalleryFavourites(ME, sort);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(String username) {
+    public Paginated<GalleryEntry<?>[]> getAccountGalleryFavourites(String username) {
         return getAccountGalleryFavourites(username, FavoriteSort.NEWEST);
     }
 
-    public Paginated<GalleryEntry[]> getAccountGalleryFavourites(String username, FavoriteSort sort)  {
+    public Paginated<GalleryEntry<?>[]> getAccountGalleryFavourites(String username, FavoriteSort sort)  {
         return new Paginated<>((int page) -> getAccountGalleryFavourites(username, page, sort));
     }
 
-    public GalleryEntry[] getAccountGalleryFavourites(int page, FavoriteSort sort) throws ApiRequestException {
+    public GalleryEntry<?>[] getAccountGalleryFavourites(int page, FavoriteSort sort) throws ApiRequestException {
         return getAccountGalleryFavourites(ME, page, sort);
     }
 
-    private GalleryEntry[] getAccountGalleryFavourites(String username, int page, FavoriteSort sort) throws ApiRequestException {
+    private GalleryEntry<?>[] getAccountGalleryFavourites(String username, int page, FavoriteSort sort) throws ApiRequestException {
         return doGetFavourites(username, page, sort, "gallery_favorites");
     }
 
-    public Paginated<GalleryEntry[]> getAccountFavourites() { return getAccountFavourites(FavoriteSort.NEWEST);}
+    public Paginated<GalleryEntry<?>[]> getAccountFavourites() { return getAccountFavourites(FavoriteSort.NEWEST);}
 
-    public Paginated<GalleryEntry[]> getAccountFavourites(FavoriteSort sort) {
+    public Paginated<GalleryEntry<?>[]> getAccountFavourites(FavoriteSort sort) {
         return new Paginated<>((int page) -> getAccountFavourites(page, sort));
     }
 
-    private GalleryEntry[] getAccountFavourites(int page, FavoriteSort sort) throws ApiRequestException {
+    private GalleryEntry<?>[] getAccountFavourites(int page, FavoriteSort sort) throws ApiRequestException {
         return doGetFavourites(ME, page, sort, "favorites");
     }
 
-    private GalleryEntry[] doGetFavourites(String username, int page, FavoriteSort sort, String type) throws ApiRequestException {
+    private GalleryEntry<?>[] doGetFavourites(String username, int page, FavoriteSort sort, String type) throws ApiRequestException {
 
         String favouritesUrl = endpointUrlWithMultiplePathParameters(username, type, toPageParam(page), sort.toString());
 
         return getImgur().http.typedGet(favouritesUrl, GalleryEntry[].class, true);
     }
 
-    public Paginated<GalleryEntry[]> getAccountSubmissions() {
+    public Paginated<GalleryEntry<?>[]> getAccountSubmissions() {
         return getAccountSubmissions(ME);
     }
 
-    public Paginated<GalleryEntry[]> getAccountSubmissions(String username) {
-        return new Paginated<>((int page) -> getAccountSubmissions(username, page));
+    public Paginated<GalleryEntry<?>[]> getAccountSubmissions(String username) {
+        return new Paginated<GalleryEntry<?>[]>((int page) -> getAccountSubmissions(username, page));
     }
 
-    public GalleryEntry[] getAccountSubmissions(String username, int page) throws ApiRequestException {
+    public GalleryEntry<?>[] getAccountSubmissions(String username, int page) throws ApiRequestException {
         String accountSubmissionUrl = endpointUrlWithMultiplePathParameters(username, "submissions", toPageParam(page));
 
         return getImgur().http.typedGet(accountSubmissionUrl, GalleryEntry[].class, true);
@@ -167,20 +167,21 @@ public class AccountEndpoint extends AbstractEndpoint {
     /**
      * @return true if the email was requested, false otherwise. False could mean there was a HTTP error, or that the
      * user has already verified their email address.
+     * @throws ApiRequestException any exception from the API
      */
     public boolean requestVerificationEmail() throws ApiRequestException {
         String verifyEmailUrl = endpointUrlWithMultiplePathParameters(ME, "verifyemail");
 
-        BasicResponse post = getImgur().http.post(verifyEmailUrl);
+        BasicResponse<?> post = getImgur().http.post(verifyEmailUrl);
 
         return post.isSuccess();
     }
 
-    public Paginated<Album[]> getAlbums() throws ApiRequestException {
+    public Paginated<Album[]> getAlbums() {
         return getAlbums(ME);
     }
 
-    public Paginated<Album[]> getAlbums(String username) throws ApiRequestException {
+    public Paginated<Album[]> getAlbums(String username) {
         return new Paginated<>((int page) -> getAlbums(username, page));
     }
 
@@ -194,11 +195,11 @@ public class AccountEndpoint extends AbstractEndpoint {
         return getImgur().album.getAlbum(albumId);
     }
 
-    public Paginated<String[]> getAlbumIds() throws ApiRequestException {
+    public Paginated<String[]> getAlbumIds() {
         return getAlbumIds(ME);
     }
 
-    public Paginated<String[]> getAlbumIds(String username) throws ApiRequestException {
+    public Paginated<String[]> getAlbumIds(String username) {
         return new Paginated<>((int page) -> getAlbumIds(username, page));
     }
 
