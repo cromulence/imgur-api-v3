@@ -26,6 +26,20 @@ repositories {
   }
 }
 
+publishing {
+    repositories {
+        maven {
+            url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+    }
+}
+
 apply from: 'dependencies.gradle'
 
 allprojects {

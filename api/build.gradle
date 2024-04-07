@@ -3,7 +3,11 @@ dependencies {
 
     implementation libs.gson
     implementation libs.guava
+
+    implementation libs.httpcore
     implementation libs.httpclient
+
+    implementation "org.apache.httpcomponents:httpclient"
 
     testImplementation project(':impl')
 
