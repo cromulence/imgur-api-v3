@@ -87,7 +87,7 @@ pipeline {
               container = docker
                 .image("gradle:7.6.4-jdk11")
                 .run(
-                  dockerArgs,
+                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}",
                   gradleArgs + " publish"
                 )
 
