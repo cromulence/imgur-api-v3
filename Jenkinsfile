@@ -14,6 +14,8 @@ pipeline {
     gcpKeyId       = 'cromulence-srvcacc-jsonAccessKey'
     gcpProjectName = "cromulence"
     garRegion      = "europe-west2"
+
+    testPropertiesId = "imgur-api-test-properties"
   }
 
   stages {
@@ -26,7 +28,7 @@ pipeline {
             "--volumes-from jenkins-worker-a-1 ",
             "-w ${env.WORKSPACE} "
           ].join(" ")
-          gradleArgs = [                                
+          gradleArgs = [
             "gradle ",
             "--stacktrace ",
             "--no-daemon ",
@@ -46,7 +48,7 @@ pipeline {
                 .image("gradle:7.6.4-jdk11")
                 .run(
                   dockerArgs,
-                  gradleArgs + " clean check build"    
+                  gradleArgs + " clean check build"
                 )
               sh "echo test container exit code \$(docker wait ${container.id})"
               sh "exit \$(docker wait ${container.id})"
@@ -55,10 +57,10 @@ pipeline {
         }
       }
     }
- 
+
     stage('Test project') {
       steps {
-        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY'), file(credentialsId: testPropertiesId, variable: 'TEST_PROPERTIES')]) {
           withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
             script {
 
@@ -66,8 +68,8 @@ pipeline {
               container = docker
                 .image("gradle:7.6.4-jdk11")
                 .run(
-                  dockerArgs,
-                  gradleArgs + " test jacocoTestReport"    
+                  dockerArgs + "-v ${TEST_PROPERTIES}:${env.WORKSPACE}/api/src/test/resources/test.properties",
+                  gradleArgs + " test jacocoTestReport"
                 )
 
               sh "echo test container exit code \$(docker wait ${container.id})"
@@ -87,7 +89,7 @@ pipeline {
                 .image("gradle:7.6.4-jdk11")
                 .run(
                   dockerArgs,
-                  gradleArgs + " publish"    
+                  gradleArgs + " publish"
                 )
 
               sh "echo test container exit code \$(docker wait ${container.id})"
