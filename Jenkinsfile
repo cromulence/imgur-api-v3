@@ -41,13 +41,13 @@ pipeline {
 
     stage('Build project') {
       steps {
-        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY'), file(credentialsId: testPropertiesId, variable: 'TEST_PROPERTIES')]) {
           withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
             script {
               container = docker
                 .image("gradle:7.6.4-jdk11")
                 .run(
-                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}",
+                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY} -v ${TEST_PROPERTIES}:${env.WORKSPACE}/api/src/test/resources/test.properties",
                   gradleArgs + " clean check build"
                 )
               sh "echo test container exit code \$(docker wait ${container.id})"
@@ -68,7 +68,7 @@ pipeline {
               container = docker
                 .image("gradle:7.6.4-jdk11")
                 .run(
-                  dockerArgs + "-v ${TEST_PROPERTIES}:${env.WORKSPACE}/api/src/test/resources/test.properties",
+                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY} -v ${TEST_PROPERTIES}:${env.WORKSPACE}/api/src/test/resources/test.properties",
                   gradleArgs + " test jacocoTestReport"
                 )
 
