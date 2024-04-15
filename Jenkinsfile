@@ -29,7 +29,7 @@ pipeline {
             "-w ${env.WORKSPACE} "
           ].join(" ")
           gradleArgs = [
-            "gradle ",
+            "pwd && gradle ",
             "--stacktrace ",
             "--no-daemon ",
             "-PgitCommit=${COMMIT_HASH} " ,
