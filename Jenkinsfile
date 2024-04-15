@@ -29,7 +29,7 @@ pipeline {
             "-w ${env.WORKSPACE} "
           ].join(" ")
           gradleArgs = [
-            "pwd && gradle ",
+            "gradle ",
             "--stacktrace ",
             "--no-daemon ",
             "-PgitCommit=${COMMIT_HASH} " ,
@@ -41,13 +41,14 @@ pipeline {
 
     stage('Build project') {
       steps {
-        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY'), file(credentialsId: testPropertiesId, variable: 'TEST_PROPERTIES')]) {
-          withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
+        withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY')]) {
+          withCredentials([file(credentialsId: testPropertiesId, variable: 'TEST_PROPERTIES')]) {
             script {
+              sh "cat ${TEST_PROPERTIES} > ./api/src/test/resources/test.properties"
               container = docker
                 .image("gradle:7.6.4-jdk11")
                 .run(
-                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY} -v ${TEST_PROPERTIES}:${env.WORKSPACE}/api/src/test/resources/test.properties",
+                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}",
                   gradleArgs + " clean check build"
                 )
               sh "echo test container exit code \$(docker wait ${container.id})"
@@ -63,12 +64,10 @@ pipeline {
         withCredentials([file(credentialsId: gcpKeyId, variable: 'GC_KEY'), file(credentialsId: testPropertiesId, variable: 'TEST_PROPERTIES')]) {
           withEnv(["GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}"]) {
             script {
-
-
               container = docker
                 .image("gradle:7.6.4-jdk11")
                 .run(
-                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY} -v ${TEST_PROPERTIES}:${env.WORKSPACE}/api/src/test/resources/test.properties",
+                  dockerArgs + " -e GOOGLE_APPLICATION_CREDENTIALS=${GC_KEY}",
                   gradleArgs + " test jacocoTestReport"
                 )
 

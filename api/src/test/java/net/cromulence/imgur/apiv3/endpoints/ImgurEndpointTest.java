@@ -54,11 +54,6 @@ public class ImgurEndpointTest {
         List<String> possibleFiles = new ArrayList<>();
 
         try {
-            LOG.error(new File(".").listFiles().toString());
-            LOG.error(new File("./api").listFiles().toString());
-            LOG.error(new File("./api/src").listFiles().toString());
-            LOG.error(new File("./api/src/test").listFiles().toString());
-            LOG.error(new File("./api/src/test/resources").listFiles().toString());
             URL resource = ImgurEndpointTest.class.getClassLoader().getResource("/test.properties");
             if(resource != null) {
                 propertiesFile = new File(resource.toURI().getPath());
