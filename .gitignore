@@ -10,3 +10,4 @@ build
 .nb-gradle-properties
 target
 out/
+*.iml

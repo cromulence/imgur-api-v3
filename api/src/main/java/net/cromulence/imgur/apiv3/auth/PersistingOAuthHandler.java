@@ -52,7 +52,4 @@ public class PersistingOAuthHandler extends AbstractAuthHandler {
         data.setAccessToken(null);
         data.setAccessTokenTimeout(-1);
     }
-
-
-
 }
