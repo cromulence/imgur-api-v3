@@ -75,7 +75,7 @@ subprojects {
     sourceCompatibility = 1.11
     targetCompatibility = 1.11
 
-    project.version = rootProject.version
+    project.version = majorMinorVersion
 
     java {
         withSourcesJar()
