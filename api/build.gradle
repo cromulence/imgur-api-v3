@@ -1,15 +1,20 @@
 dependencies {
     compileOnly libs.slf4j
 
-    compile libs.gson
-    compile libs.guava
-    compile libs.httpclient
+    implementation libs.gson
+    implementation libs.guava
 
-    testCompile project(':impl')
+    implementation libs.httpcore
+    implementation libs.httpclient
 
-    testCompile libs.datawrapperProperties
+    implementation "org.apache.httpcomponents:httpclient"
 
-    testCompile libs.slf4jSimple
-    testCompile libs.junit
-    testCompile libs.openPojo
+    testImplementation project(':impl')
+
+    testImplementation libs.datawrapperApi
+    testImplementation libs.datawrapperProperties
+
+    testImplementation libs.slf4jSimple
+    testImplementation libs.junit
+    testImplementation libs.openPojo
 }

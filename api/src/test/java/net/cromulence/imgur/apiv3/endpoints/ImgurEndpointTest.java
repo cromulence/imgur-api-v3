@@ -1,9 +1,8 @@
 package net.cromulence.imgur.apiv3.endpoints;
 
-import static junit.framework.TestCase.fail;
-
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import com.google.gson.JsonParser;
 import net.cromulence.datawrapper.DataWrapper;
 import net.cromulence.datawrapper.DataWrapperException;
 import net.cromulence.datawrapper.DataWrapperImpl;
@@ -14,23 +13,24 @@ import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthData;
 import net.cromulence.imgur.apiv3.auth.ImgurOAuthHandler;
 import net.cromulence.imgur.apiv3.auth.PersistingOAuthHandler;
-
+import net.cromulence.imgur.apiv3.datamodel.AuthResponse;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+
+import static junit.framework.TestCase.fail;
 
 public class ImgurEndpointTest {
 
-    private static Logger LOG = LoggerFactory.getLogger(ImgurEndpointTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImgurEndpointTest.class);
 
     private static File propertiesFile;
 
@@ -42,26 +42,36 @@ public class ImgurEndpointTest {
     private static PersistingOAuthHandler user1Auth;
     private static PersistingOAuthHandler user2Auth;
 
-    private static String[] propertiesPaths = new String[]{"./api/src/test/resources", "./src/test/resources", "/home/travis"};
+    private static String[] propertiesPaths = new String[]{ "./api/src/test/resources", "./src/test/resources", "/home/travis" };
 
     @BeforeClass
     public static void setup() throws Exception {
         setup(true);
     }
-    public static void setup(boolean failIfNoValidTokens) throws IOException, ApiRequestException, DataWrapperException {
+    public static void setup(boolean failIfNoValidTokens) throws IOException, ApiRequestException, DataWrapperException, DataWrapperException {
         propertiesFile = null;
 
         List<String> possibleFiles = new ArrayList<>();
 
+        try {
+            URL resource = ImgurEndpointTest.class.getClassLoader().getResource("/test.properties");
+            if(resource != null) {
+                propertiesFile = new File(resource.toURI().getPath());
+            }
+        } catch (URISyntaxException e) {
+            // nothing needed
+        }
 
-        for(String path : propertiesPaths) {
-            File parent = new File(path);
-            File file = new File(parent, "test.properties");
-            possibleFiles.add(file.getAbsolutePath());
-            if(file.exists() && file.isFile()&& file.canRead() && file.length() > 0) {
-                propertiesFile = file;
-                LOG.info("found test.properties at {}", file.getAbsolutePath());
-                break;
+        if(propertiesFile == null) {
+            for (String path : propertiesPaths) {
+                File parent = new File(path);
+                File file = new File(parent, "test.properties");
+                possibleFiles.add(file.getAbsolutePath());
+                if (file.exists() && file.isFile() && file.canRead() && file.length() > 0) {
+                    propertiesFile = file;
+                    LOG.info("found test.properties at {}", file.getAbsolutePath());
+                    break;
+                }
             }
         }
 
@@ -89,7 +99,7 @@ public class ImgurEndpointTest {
                 fail("User 1 does not have a valid access token");
             } else {
                 LOG.info("User 1 does not have a valid access token");
-                getAndExchangePin(user1ImgurUnderTest, user1Auth, user1AuthData.getUsername());
+                getToken(user1ImgurUnderTest, user1Auth, user1AuthData.getUsername());
             }
         }
 
@@ -98,7 +108,7 @@ public class ImgurEndpointTest {
                 fail("User 2 does not have a valid access token");
             } else {
                 LOG.info("User 2 does not have a valid access token");
-                getAndExchangePin(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
+                getToken(user2ImgurUnderTest, user2Auth, user2AuthData.getUsername());
             }
         }
 
@@ -148,6 +158,37 @@ public class ImgurEndpointTest {
             // Do nothing
             Thread.currentThread().interrupt();
         }
+    }
+
+    private static void getToken(Imgur imgur, ImgurOAuthHandler ah, String user) throws IOException, ApiRequestException {
+
+        String tokenLoginUrl = String.format("%s/authorize?response_type=token&client_id=%s&state=%s", imgur.auth.getEndpointUrl(), imgur.data.getClientId(), user);
+
+        System.out.println("log in to imgur as " + user + " and go to the following URL");
+        System.out.println("Once redirected, copy redirect page URL from browser and paste it in here");
+        System.out.println(tokenLoginUrl);
+
+        // http://localhost:9876/oauth/callback?username=name#other=args&for=oauth
+
+        BufferedReader bin = new BufferedReader(new InputStreamReader(System.in));
+        String readLine = bin.readLine();
+
+        // Everything after the ?
+        readLine = readLine.substring(readLine.indexOf("?") + 1);
+
+        // Turn the fragment into a query parameter so we cen handle everything the same
+        readLine.replace("#", "&");
+
+        // Get the KVPs
+        String[] split = readLine.split("#|&");
+
+        // Split them into Ks and Vs in a map
+        Map<String, String> params = new HashMap<>();
+        Arrays.stream(split).forEach(kvp -> params.put(kvp.split("=")[0], kvp.split("=")[1]));
+
+        // Convert the map to an auth response
+        final Gson gson = new Gson();
+        ah.handleAuth(gson.fromJson(gson.toJson(params), AuthResponse.class));
     }
 
     private static void getAndExchangePin(Imgur imgur, ImgurOAuthHandler ah, String user) throws IOException, ApiRequestException {

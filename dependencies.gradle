@@ -1,4 +1,4 @@
-ext.datawrapperVersion = "0.9"
+ext.datawrapperVersion = "0.14"
 
 ext.libs = [
         datawrapperApi:        "net.cromulence.datawrapper:datawrapper-api:${ext.datawrapperVersion}",
@@ -6,6 +6,8 @@ ext.libs = [
         guava:                 "com.google.guava:guava:17.0",
         gson:                  "com.google.code.gson:gson:2.8.1",
         httpclient:            "org.apache.httpcomponents:httpclient:4.5.2",
+        httpcore:              "org.apache.httpcomponents:httpcore:4.4.4",
+
         jacksonDatabind:       "com.fasterxml.jackson.core:jackson-databind:2.5.1",
         jacksonDataformat:     "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.5.1",
         jacksonJson:           "com.github.pgelinas:jackson-javax-json:0.9.0",
@@ -18,5 +20,5 @@ ext.libs = [
         slf4j:                 "org.slf4j:slf4j-api:1.7.12",
         slf4jSimple:           "org.slf4j:slf4j-simple:1.7.12",
 
-        openPojo:              "com.openpojo:openpojo:0.8.6"
+        openPojo:              "com.openpojo:openpojo:0.9.1"
 ]

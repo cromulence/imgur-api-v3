@@ -1,7 +1,6 @@
 package net.cromulence.imgur.apiv3.api;
 
 import net.cromulence.imgur.apiv3.api.exceptions.ApiRequestException;
-
 import org.apache.http.HttpResponse;
 
 import java.io.Serializable;

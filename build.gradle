@@ -1,30 +1,54 @@
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
         mavenCentral()
-        maven {
-            url  "http://dl.bintray.com/cromulence/maven"
-        }
     }
+
     dependencies {
-        classpath "net.cromulence.buildsystem.gradle:travis-bintray:+"
-        classpath 'com.palantir:jacoco-coverage:0.4.0'
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+        classpath 'gradle.plugin.co.riiid:gradle-github-plugin:0.4.2'
     }
 }
 
-apply plugin: 'com.palantir.jacoco-full-report'
+//plugins loaded from special gradle plugin repo...
+plugins {
+    //google "gradle build scan" or https://github.com/gradle/gradle-build-scan-quickstart
+    // essentially, ./gradlew build -Dscan
+    id 'com.gradle.build-scan' version '1.0' //google "gradle build scan"
+    id "maven-publish"
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.2.1"
+    id 'jacoco'
+}
+
+repositories {
+  maven {
+    url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+  }
+}
+
+publishing {
+    repositories {
+        maven {
+            url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+        }
+    }
+}
+
+repositories {
+    maven {
+        url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+    }
+}
+
 apply from: 'dependencies.gradle'
 
 allprojects {
-
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
-    apply plugin: 'travis-bintray'
-    apply plugin: 'maven'
-    apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
+    apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
 
     //apply plugin: 'nebula.lint'
 
@@ -34,9 +58,9 @@ allprojects {
 
     repositories {
         mavenLocal()
-        jcenter()
+        mavenCentral()
         maven {
-            url  "http://dl.bintray.com/cromulence/maven"
+            url  "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
         }
     }
 
@@ -48,10 +72,15 @@ allprojects {
 
 subprojects {
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 
     project.version = rootProject.version
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
 
     compileJava {
         options.debug = true
@@ -96,42 +125,68 @@ subprojects {
             // showStandardStreams = true        // Show console output from the running tests
 
         }
+        finalizedBy jacocoTestReport // report is always generated after tests run
     }
-    if(System.env['JAVA_HOME'] == null){
-        throw new GradleException('JAVA_HOME not set')
+
+    jacocoTestReport {
+        dependsOn test // tests are required to run before generating the report
     }
+
+    // if(System.env['JAVA_HOME'] == null){
+    //     throw new GradleException('JAVA_HOME not set')
+    // }
+
+    if (project.plugins.hasPlugin('java')) {
+        configurations {
+            published
+        }
+    }
+
+    publishing {
+      repositories {
+        maven {
+          url "artifactregistry://europe-west2-maven.pkg.dev/cromulence/nexus"
+        }
+      }
+
+      publications {
+        mavenJava(MavenPublication) {
+          groupId  gavGroup
+          from components.java
+        }
+      }
+    }
+
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+  archiveClassifier = "sources"
 }
 
 task codeCoverageReport(type: JacocoReport) {
-  executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+    executionData fileTree(project.rootProject.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
-  subprojects.each {
-    sourceSets it.sourceSets.main
-  }
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
 
-  reports {
-    xml.enabled true
-    //xml.destination "${buildDir}/reports/jacoco/report.xml"
-    html.enabled true
-    csv.enabled true
-  }
-}
-
-task jacocoMerge(type: JacocoMerge) {
-  dependsOn(subprojects.jacocoTestReport.dependsOn)
-  mustRunAfter(subprojects.jacocoTestReport.mustRunAfter)
-  destinationFile = file("${buildDir}/jacoco/test.exec")
-  executionData = files(subprojects.jacocoTestReport.executionData).filter { f -> f.exists() }
+    reports {
+        xml.enabled true
+        //xml.destination "${buildDir}/reports/jacoco/report.xml"
+        html.enabled true
+        csv.enabled true
+    }
 }
 
 codeCoverageReport.dependsOn {
-  subprojects*.test
+    subprojects*.test
 }
 
 configurations {
     published
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.12'
+wrapper {
+    gradleVersion = '7.6'
 }
